@@ -8,9 +8,9 @@ Group 19 yes.
 ### This is the best team ever!!! YAY
 
 Team Members:
-dsb5fv
-mgs4ff
-kq4hy
-sdg6vt
+dsb5fv - Divya
+mgs4ff - Maddie Stigler
+kq4hy - Kevin
+sdg6vt - Spencer
 
 ### This is the best team ever!!!!!!
