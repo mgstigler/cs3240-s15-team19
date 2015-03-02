@@ -52,3 +52,18 @@ docs/_build/
 
 # PyBuilder
 target/
+
+#files to ignore
+settings.py
+ 
+#extensions to ignore
+*.log
+*.pot
+*.pyc
+ 
+#directories to ignore
+.idea/
+
+# database
+*.sqlite3
+*.db
