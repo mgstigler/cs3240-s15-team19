@@ -9,6 +9,8 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^report/', report),
-    url(r'^submit$', submit)
+    url(r'^submit$', submit),
 
+    # secure_witness app urls
+    url(r'^secure_witness/', include('secure_witness.urls', namespace="secure_witness"))
 )
