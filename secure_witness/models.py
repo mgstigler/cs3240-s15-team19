@@ -10,7 +10,12 @@ class Report(models.Model):
     detailed = models.CharField(max_length=1000)
     location = models.CharField(max_length=50)
     date = models.CharField(max_length=1000)
-    keywords = models.CharField(max_length=1000)
+    #keywords = models.CharField(max_length=1000)
     private = models.BooleanField(default=False)
-    #keywords = models.ManyToManyField(Keyword)
+    keywords = models.ManyToManyField(Keyword)
+
+    def __str__(self):
+       ''.join([self.short, self.detailed])
+
+
 
