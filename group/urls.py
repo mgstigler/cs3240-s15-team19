@@ -1,7 +1,13 @@
 from django.conf.urls import patterns, include, url
+
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 import secure_witness.views
+
+from django.contrib import admin
+from secure_witness.views import report, submit
+
+
 
 
 urlpatterns = patterns('',
@@ -17,6 +23,13 @@ urlpatterns = patterns('',
         name='folders-view',),
     url(r'^edit/(?P<pk>\d+)/files$', secure_witness.views.EditFolderFileView.as_view(),
         name='folders-edit-files',),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^report/', report),
+    url(r'^submit$', submit),
+
+    # secure_witness app urls
+    url(r'^secure_witness/', include('secure_witness.urls', namespace="secure_witness"))
+
 )
 
 urlpatterns += staticfiles_urlpatterns()
