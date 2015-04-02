@@ -3,15 +3,14 @@ from django.views.generic import CreateView
 from django.views.generic import UpdateView
 from django.views.generic import DeleteView
 from django.views.generic import DetailView
-from secure_witness import forms
-
-from secure_witness.models import Folder
+from django.shortcuts import render
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 
-from django.shortcuts import render
-from secure_witness.models import Report, Keyword
-from django.contrib.auth import authenticate, login
-from django.http import HttpResponseRedirect, HttpResponse
+from secure_witness import forms
+from secure_witness.models import Report, Keyword, Folder
 from secure_witness.forms import UserForm
 
 
@@ -112,9 +111,8 @@ def user_login(request):
         if user:
             if user.is_active:
                 login(request, user)
-                return HttpResponse("Login successful")
                 # Link to the post-login screen
-                #return HttpResponseRedirect('/secure_witness/')
+                return HttpResponseRedirect('/')
             else:
                 return HttpResponse("Account is disabled. Please contact the admin.")
 
@@ -127,7 +125,13 @@ def user_login(request):
     else:
         return render(request, 'login.html', {})
 
-# Create your views here.
+@login_required
+def user_logout(request):
+    # User must be logged in to reach this section, so can just logout
+    logout(request)
+
+    return HttpResponseRedirect('/')
+
 def register(request):
     # Indicate status of registration
     registered = False

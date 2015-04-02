@@ -1,15 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title>user Registration</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block content %}
     <h1>Register for Secure Witness</h1>
     {% if registered %}
         Thank you for registering! <br />
     {% else %}
-        Register here
         <form id="user_form" method="post" action="{% url 'register' %}">
             {% csrf_token %}
 
@@ -19,5 +14,5 @@
             <input type="submit" name="Submit" value="Register" />
         </form>
     {% endif %}
-</body>
-</html>
+
+{% endblock %}

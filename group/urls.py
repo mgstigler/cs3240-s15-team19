@@ -32,13 +32,15 @@ urlpatterns = patterns('',
     url(r'^edit/(?P<pk>\d+)/files$', secure_witness.views.EditFolderFileView.as_view(),
         name='folders-edit-files',),
     #/report/
-    url(r'^report/', report),
+    url(r'^report/', report, name='report-new'),
     #/submit/
     url(r'^submit$', submit),
     #/register/
     url(r'^register/$', secure_witness.views.register, name='register'),
     #/login/
     url(r'^login/$', secure_witness.views.user_login, name='login'),
+    #/logout/
+    url(r'^logout/', secure_witness.views.user_logout, name='logout'),
 
 )
 
