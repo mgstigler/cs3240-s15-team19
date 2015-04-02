@@ -78,7 +78,7 @@ class EditFolderFileView(UpdateView):
 
 # Create your views here.
 def report(request):
-    return render(request, 'enterreport.html', {})
+    return render(request, 'enter_report.html', {})
 
 def submit(request):
     s = request.POST['short_description']
@@ -125,7 +125,7 @@ def user_login(request):
 
     # GET request, create a blank form
     else:
-        return render(request, 'secure_witness/login.html', {})
+        return render(request, 'login.html', {})
 
 # Create your views here.
 def register(request):
@@ -155,7 +155,7 @@ def register(request):
         user_form = UserForm()
 
     # Return the appropriate request, created above
-    return render(request, 'secure_witness/register.html', {
+    return render(request, 'register.html', {
         'user_form': user_form,
         'registered': registered,
     })

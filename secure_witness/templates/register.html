@@ -10,7 +10,7 @@
         Thank you for registering! <br />
     {% else %}
         Register here
-        <form id="user_form" method="post" action="{% url 'secure_witness:register' %}">
+        <form id="user_form" method="post" action="{% url 'register' %}">
             {% csrf_token %}
 
             <!-- Display forms as <p> elements for formatting -->

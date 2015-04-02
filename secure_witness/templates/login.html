@@ -7,7 +7,7 @@
 <body>
     <h1>Login to Secure Witness</h1>
 
-    <form id="login_form" method="post" action="{% url 'secure_witness:login' %}">
+    <form id="login_form" method="post" action="{% url 'login' %}">
         {% csrf_token %}
         <input type="text" name="username" value="" placeholder="Username" size="50" /><br />
         <input type="password" name="password" value="" placeholder="Password" size="50" /><br />
