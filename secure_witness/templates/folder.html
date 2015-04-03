@@ -9,9 +9,10 @@
 
 <ul>
 {%  for file in folder.file_set.all %}
-    <li>{{ file.file_name }} {{ file.file_id }}</li>
+    <li>{{ file.short }} {{ file.detailed }}</li>
 {%  endfor %}
 </ul>
-
+<a href="{% url "report-new" %}">Add a Report</a>
+<a href="{% url "folders-list" %}">Back to List</a>
 
 {% endblock %}
