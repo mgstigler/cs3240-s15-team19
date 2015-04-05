@@ -5,7 +5,6 @@ from django.views.generic import DeleteView
 from django.views.generic import DetailView
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 
@@ -17,7 +16,6 @@ from secure_witness.forms import UserForm
 
 
 class ListFolderView(ListView):
-
     model = Folder
     template_name = 'folder_list.html'
 
@@ -125,7 +123,6 @@ def user_login(request):
     else:
         return render(request, 'login.html', {})
 
-@login_required
 def user_logout(request):
     # User must be logged in to reach this section, so can just logout
     logout(request)
