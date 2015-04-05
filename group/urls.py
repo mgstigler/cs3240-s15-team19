@@ -41,6 +41,8 @@ urlpatterns = patterns('',
     url(r'^login/$', secure_witness.views.user_login, name='login'),
     #/logout/
     url(r'^logout/', secure_witness.views.user_logout, name='logout'),
+    #/groups/
+    url(r'^group-list', secure_witness.views.list_groups, name='group-list')
 
 )
 

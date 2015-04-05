@@ -6,11 +6,12 @@ from django.views.generic import DetailView
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 
 from secure_witness import forms
-from secure_witness.models import Report, Keyword, Folder
+from secure_witness.models import Report, Keyword, Folder, UserProfile
 from secure_witness.forms import UserForm
 
 
@@ -74,8 +75,6 @@ class EditFolderFileView(UpdateView):
         return self.get_object().get_absolute_url()
 
 
-
-# Create your views here.
 def report(request):
     return render(request, 'enter_report.html', {})
 
@@ -162,4 +161,12 @@ def register(request):
     return render(request, 'register.html', {
         'user_form': user_form,
         'registered': registered,
+    })
+
+def list_groups(request):
+    # Get all groups for current user
+    group_list = request.user.groups.all()
+
+    return render(request, 'group_list.html', {
+        'group_list': group_list,
     })
