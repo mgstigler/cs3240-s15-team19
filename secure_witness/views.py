@@ -163,10 +163,21 @@ def register(request):
         'registered': registered,
     })
 
-def list_groups(request):
-    # Get all groups for current user
-    group_list = request.user.groups.all()
+class GroupListView(ListView):
+    context_object_name = "group_list"
+    template_name = "group_list.html"
 
-    return render(request, 'group_list.html', {
-        'group_list': group_list,
-    })
+    def get_queryset(self):
+        return self.request.user.groups.all()
+
+
+class GroupDetailView(DetailView):
+    model = Group
+    context_object_name = "group"
+    template_name = "group_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context =  super(GroupDetailView, self).get_context_data(**kwargs)
+        context['user_list'] = self.object.user_set.all()
+        return context
+

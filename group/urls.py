@@ -42,8 +42,11 @@ urlpatterns = patterns('',
     #/logout/
     url(r'^logout/', secure_witness.views.user_logout, name='logout'),
     #/groups/
-    url(r'^group-list', secure_witness.views.list_groups, name='group-list')
-
+    url(r'^groups/list', secure_witness.views.GroupListView.as_view(),
+        name='group-list'),
+    #/groups/1
+    url(r'^groups/(?P<pk>\d+)/', secure_witness.views.GroupDetailView.as_view(),
+        name='group-detail'),
 )
 
 urlpatterns += staticfiles_urlpatterns()
