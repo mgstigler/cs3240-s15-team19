@@ -48,6 +48,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'secure_witness.middleware.LoginRequiredMiddleware',
 )
 
 ROOT_URLCONF = 'group.urls'
@@ -77,6 +78,14 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+# urls that can be accessed without login
+LOGIN_EXEMPT_URLS = (
+    '/register/',
+    '/login/',
+)
+
+LOGIN_URL = '/login/'
 
 
 # Static files (CSS, JavaScript, Images)

@@ -7,6 +7,8 @@
 <h3>Fill out the form below to create a new report</h3>
 <form method="post" action="/submit">
 	{% csrf_token %}
+
+    Enter report in folder: {{folder}}
     Short description:<br/>
 	<textarea name='short_description' rows='4' cols='50' maxlength='100' required></textarea><br/>
     <br/>

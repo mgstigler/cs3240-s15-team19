@@ -5,20 +5,19 @@ from django.views.generic import DeleteView
 from django.views.generic import DetailView
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 
 from secure_witness import forms
-from secure_witness.models import Report, Keyword, Folder, UserProfile
+from secure_witness.models import Folder, File
+#from secure_witness.models import Report, Keyword, Folder, File
 from secure_witness.forms import UserForm
 
 
 
 
 class ListFolderView(ListView):
-
     model = Folder
     template_name = 'folder_list.html'
 
@@ -67,32 +66,31 @@ class FolderView(DetailView):
 class EditFolderFileView(UpdateView):
 
     model = Folder
-    template_name = 'edit_files.html'
+    template_name = 'enter_report.html'
     form_class = forms.FolderFileFormSet
 
     def get_success_url(self):
 
         return self.get_object().get_absolute_url()
 
-
 def report(request):
     return render(request, 'enter_report.html', {})
 
 def submit(request):
-    s = request.POST['short_description']
-    d = request.POST['detailed_description']
-    l = request.POST['location']
-    k = request.POST['keywords']
-    i = request.POST['incident_date']
-    p = request.POST['privacy']
+    s = request.POST.get('short_description')
+    d = request.POST.get('detailed_description')
+    l = request.POST.get('location')
+    k = request.POST.get('keywords')
+    i = request.POST.get('incident_date')
+    p = request.POST.get('privacy')
 
     priv = False
     if p == 'Private':
         priv = True
 
-    rep = Report(short=s, detailed=d, location=l, date=i, keywords=k, private=priv)
+    rep = File(short=s, detailed=d, location=l, keywords=k, today=i, private=priv)
     rep.save()
-    all = Report.objects.all() #filter(short='short')
+    all = File.objects.all() #filter(short='short')
     return HttpResponse(str(all))
 
 
@@ -124,7 +122,6 @@ def user_login(request):
     else:
         return render(request, 'login.html', {})
 
-@login_required
 def user_logout(request):
     # User must be logged in to reach this section, so can just logout
     logout(request)

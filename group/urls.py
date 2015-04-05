@@ -1,10 +1,9 @@
 from django.conf.urls import patterns, include, url
-
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf import settings
+from django.contrib import admin
 
 import secure_witness.views
-
-from django.contrib import admin
 from secure_witness.views import report, submit
 
 
