@@ -1,27 +1,37 @@
 [
   {
     "model": "auth.group",
-    "pk": 1,
     "fields": {
-      "name": "admins"
-    }
+      "name": "admins",
+      "permissions": []
+    },
+    "pk": 1
   },
+
   {
     "model": "auth.user",
-    "pk": 1,
     "fields": {
-      "first_name": "",
-      "date_joined": "2015-04-02T18:56:32.483Z",
-      "username": "root",
-      "is_superuser": true,
-      "password": "pbkdf2_sha256$15000$SwYRt2E5mE5I$+//0IramOk+wbLjYG/LhbVfmcTSSmuqWLgE5OifUjgU=",
+      "user_permissions": [],
       "last_name": "",
       "is_staff": true,
-      "groups": [],
-      "user_permissions": [],
+      "is_superuser": true,
+      "first_name": "",
+      "groups": [2],
+      "date_joined": "2015-04-05T03:58:33.482Z",
+      "password": "pbkdf2_sha256$15000$aNpLamLEA3nB$RVbX/4LZiNePwgDwayHn2TW2qu4lMMV1eZP+CJ0vEaQ=",
+      "last_login": "2015-04-05T03:58:33.482Z",
+      "email": "admin@securewitness.org",
       "is_active": true,
-      "email": "admin@securewitness.com",
-      "last_login": "2015-04-02T18:56:32.483Z"
-    }
+      "username": "root"
+    },
+    "pk": 1
+  },
+
+  {
+    "model": "secure_witness.userprofile",
+    "fields": {
+      "user": 1
+    },
+    "pk": 1
   }
 ]
