@@ -4,9 +4,15 @@
 
     <h1>Manage Groups</h1>
 
+    <a href="{% url 'group-create' %}">Create a new group</a><br />
+
     <ul>
     {% for group in group_list %}
-        <li><a href="{% url 'group-detail' pk=group.id %}">{{ group.name }}</a></li>
+        <li>
+            <a href="{% url 'group-detail' pk=group.id %}">{{ group.name }}</a><br />
+            <a href="{% url 'group-edit' pk=group.id %}">Edit</a><br />
+            <a href="{% url 'group-delete' pk=group.id %}">Delete</a>
+        </li>
     {% endfor %}
     </ul>
 

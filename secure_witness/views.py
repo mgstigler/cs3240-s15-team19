@@ -181,3 +181,31 @@ class GroupDetailView(DetailView):
         context['user_list'] = self.object.user_set.all()
         return context
 
+class GroupEditView(UpdateView):
+    model = Group
+    context_object_name = "group"
+    template_name = 'group_edit.html'
+
+    fields = ['name']
+
+    def get_success_url(self):
+        return reverse('group-list')
+
+class GroupDeleteView(DeleteView):
+    model = Group
+    template_name = 'group_confirm_delete.html'
+
+class GroupCreateView(CreateView):
+    model = Group
+    fields = ['name']
+    template_name = 'group_edit.html'
+
+    def get_success_url(self):
+        return reverse('group-list')
+
+    def form_valid(self, form):
+        # Add the current user to the group
+        g = form.save()
+        g.user_set.add(self.request.user)
+        g.save()
+        return super(GroupCreateView, self).form_valid(form)

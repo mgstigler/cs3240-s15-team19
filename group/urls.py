@@ -40,13 +40,22 @@ urlpatterns = patterns('',
     #/login/
     url(r'^login/$', secure_witness.views.user_login, name='login'),
     #/logout/
-    url(r'^logout/', secure_witness.views.user_logout, name='logout'),
+    url(r'^logout/$', secure_witness.views.user_logout, name='logout'),
     #/groups/
-    url(r'^groups/list', secure_witness.views.GroupListView.as_view(),
+    url(r'^groups/list/$', secure_witness.views.GroupListView.as_view(),
         name='group-list'),
     #/groups/1
-    url(r'^groups/(?P<pk>\d+)/', secure_witness.views.GroupDetailView.as_view(),
+    url(r'^groups/(?P<pk>\d+)/$', secure_witness.views.GroupDetailView.as_view(),
         name='group-detail'),
+    #/groups/1/edit
+    url(r'^groups/(?P<pk>\d+)/edit$', secure_witness.views.GroupEditView.as_view(),
+        name='group-edit'),
+    #/groups/1/delete
+    url(r'^groups/delete/(?P<pk>\d+)/delete$', secure_witness.views.GroupDeleteView.as_view(),
+        name='group-delete'),
+    #/groups/create
+    url(r'^groups/create/$', secure_witness.views.GroupCreateView.as_view(),
+        name='group-create'),
 )
 
 urlpatterns += staticfiles_urlpatterns()
