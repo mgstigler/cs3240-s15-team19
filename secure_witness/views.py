@@ -196,6 +196,9 @@ class GroupDeleteView(DeleteView):
     model = Group
     template_name = 'group_confirm_delete.html'
 
+    def get_success_url(self):
+        return reverse('group-list')
+
 class GroupCreateView(CreateView):
     model = Group
     fields = ['name']
