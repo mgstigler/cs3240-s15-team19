@@ -164,7 +164,11 @@ class GroupListView(ListView):
     template_name = "group_list.html"
 
     def get_queryset(self):
-        return self.request.user.groups.all()
+        user = self.request.user
+        if user.groups.filter(name='admins').exists():
+            return Group.objects.all()
+        else:
+            return self.request.user.groups.all()
 
 
 class GroupDetailView(DetailView):
