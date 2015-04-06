@@ -15,6 +15,21 @@
         <input id="save_group" type="submit" value="Save" />
     </form>
 
+    <form id="add_user_form" action="{% url 'group-add-user' group_id=group.id %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username" />
+        <input type="submit" value="Add User">
+    </form>
+
+    <ul>
+    {% for user in user_list %}
+        <li>
+            {{ user.username }}
+            <a href="{% url 'group-remove-user' group_id=group.id user_id=user.id %}">Remove</a>
+        </li>
+    {% endfor %}
+    </ul>
+
     <a href="{% url 'group-list' %}">Back to List</a>
 
 {% endblock %}

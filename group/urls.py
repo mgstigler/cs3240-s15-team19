@@ -47,7 +47,7 @@ urlpatterns = patterns('',
     url(r'^groups/(?P<pk>\d+)/$', secure_witness.views.GroupDetailView.as_view(),
         name='group-detail'),
     #/groups/1/edit
-    url(r'^groups/(?P<pk>\d+)/edit$', secure_witness.views.GroupEditView.as_view(),
+    url(r'^groups/(?P<pk>\d+)/edit/$', secure_witness.views.GroupEditView.as_view(),
         name='group-edit'),
     #/groups/1/delete
     url(r'^groups/delete/(?P<pk>\d+)/delete$', secure_witness.views.GroupDeleteView.as_view(),
@@ -55,6 +55,12 @@ urlpatterns = patterns('',
     #/groups/create
     url(r'^groups/create/$', secure_witness.views.GroupCreateView.as_view(),
         name='group-create'),
+    #/groups/1/edit/add-user
+    url(r'^groups/(?P<group_id>\d+)/edit/add-user/$', secure_witness.views.add_user,
+        name='group-add-user'),
+    #/groups/1/edit/remove-user/1
+    url(r'^groups/(?P<group_id>\d+)/edit/remove-user/(?P<user_id>\d+)/$', secure_witness.views.remove_user,
+        name='group-remove-user'),
 )
 
 urlpatterns += staticfiles_urlpatterns()

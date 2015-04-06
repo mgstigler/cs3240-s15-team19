@@ -5,13 +5,12 @@ from django.views.generic import DeleteView
 from django.views.generic import DetailView
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 
 from secure_witness import forms
 from secure_witness.models import Folder, File
-#from secure_witness.models import Report, Keyword, Folder, File
 from secure_witness.forms import UserForm
 
 
@@ -188,6 +187,11 @@ class GroupEditView(UpdateView):
     def get_success_url(self):
         return reverse('group-list')
 
+    def get_context_data(self, **kwargs):
+        context =  super(GroupEditView, self).get_context_data(**kwargs)
+        context['user_list'] = self.object.user_set.all()
+        return context
+
 class GroupDeleteView(DeleteView):
     model = Group
     template_name = 'group_confirm_delete.html'
@@ -206,3 +210,35 @@ class GroupCreateView(CreateView):
         g.user_set.add(self.request.user)
         g.save()
         return super(GroupCreateView, self).form_valid(form)
+
+def add_user(request, group_id):
+    if request.method == 'POST':
+        # Get the username from the request
+        username = request.POST.get('username')
+
+        # Retrieve user object with the specified username
+        user_list = User.objects.filter(username=username)
+
+        # If user with username exists, add them to the current group
+        if len(user_list) > 0:
+            user = user_list[0]
+            group_id = int(group_id)
+            g = Group.objects.get(id=group_id)
+            g.user_set.add(user)
+        else:
+            # TODO HANDLE ERRORS
+            print("User not found")
+
+    # Return to the group-edit page
+    return HttpResponseRedirect(reverse('group-edit', args=(group_id,)))
+
+def remove_user(request, group_id, user_id):
+    group_id = int(group_id)
+    user_id = int(user_id)
+
+    # Remove the user from the group
+    g = Group.objects.get(id=group_id)
+    u = User.objects.get(id=user_id)
+    g.user_set.remove(u)
+
+    return HttpResponseRedirect(reverse('group-edit', args=(group_id,)))
