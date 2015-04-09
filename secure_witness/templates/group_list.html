@@ -2,18 +2,29 @@
 
 {% block content %}
 
+    <div class="container">
     <h1>Manage Groups</h1>
 
-    <a href="{% url 'group-create' %}">Create a new group</a><br />
-
-    <ul>
+    <div class="list-group">
     {% for group in group_list %}
-        <li>
-            <a href="{% url 'group-detail' pk=group.id %}">{{ group.name }}</a><br />
-            <a href="{% url 'group-edit' pk=group.id %}">Edit</a><br />
-            <a href="{% url 'group-delete' pk=group.id %}">Delete</a>
-        </li>
+        <a class="list-group-item clearfix" href="{% url 'group-detail' pk=group.id %}">
+            {{ group.name }}
+            <span class="pull-right">
+                <form style="display: inline" action="{% url 'group-edit' pk=group.id %}">
+                    <button class="btn btn-primary" type="submit">Edit</button>
+                </form>
+                <form style="display: inline" action="{% url 'group-delete' pk=group.id %}">
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                </form>
+            </span>
+        </a>
     {% endfor %}
-    </ul>
+        <a class="list-group-item text-center" href="{% url 'group-create' %}">
+            <span class="glyphicon glyphicon-plus"></span>
+            Create a New Group
+        </a>
+    </div>
+
+    </div>
 
 {% endblock %}
