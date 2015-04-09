@@ -15,11 +15,13 @@
         <input id="save_group" type="submit" value="Save" />
     </form>
 
+    {% if group.id %}
     <form id="add_user_form" action="{% url 'group-add-user' group_id=group.id %}" method="post">
         {% csrf_token %}
         <input type="text" name="username" placeholder="Username" />
         <input type="submit" value="Add User">
     </form>
+    {% endif %}
 
     <ul>
     {% for user in user_list %}
