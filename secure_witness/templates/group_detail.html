@@ -1,15 +1,27 @@
 {% extends "base.html" %}
 
 {%  block content %}
-    <h1>Group Info</h1>
 
-    <p>Name: {{ group.name }}</p>
+    <div class="container">
+        <h1>Group Info</h1>
+        <a href="{% url 'group-list' %}">Back to List</a>
 
-    <h3>Users</h3>
-    <ul>
-    {% for user in user_list %}
-        <li>{{ user.username }}</li>
-    {% endfor %}
-    </ul>
+        <p>Name: {{ group.name }}</p>
+
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <span class="col-md-4">Users</span>
+                <span class="col-md-6">Email</span>
+            </div>
+            <ul class="list-group">
+                {% for user in user_list %}
+                <li class="list-group-item clearfix">
+                    <span class="col-md-4">{{ user.username }}</span>
+                    <span class="col-md-6">{{ user.email }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div><!-- END PANEL -->
+    </div>
 
 {% endblock %}
