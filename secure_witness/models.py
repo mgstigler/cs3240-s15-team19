@@ -22,8 +22,8 @@ class Keyword(models.Model):
    keywords = models.CharField(max_length=100, default='', null=True)
 
 class Report(models.Model):
-    folder = models.ForeignKey(Folder)
-    time = models.CharField(max_length=50, default='', null=True)
+    folder = models.ForeignKey(Folder, null=True)
+    time = models.DateField(max_length=50, null=True)
     short = models.CharField(max_length=200, default='', null=True)
     detailed = models.CharField(max_length=1000, default='', null=True)
     location = models.CharField(max_length=50, default='', null=True)

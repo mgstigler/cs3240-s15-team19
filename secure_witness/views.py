@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 
 from secure_witness import forms
 from secure_witness.models import Folder, Media, Report
-from secure_witness.forms import UserForm
+from secure_witness.forms import UserForm, ReportForm
 
 
 def saved(request):
@@ -28,6 +28,7 @@ class CreateReportView(CreateView):
 
     model = Report
     template_name = 'report_edit.html'
+    form_class = ReportForm
 
     def get_success_url(self):
         # Save each file associated with the report
@@ -37,9 +38,8 @@ class CreateReportView(CreateView):
             print("Saved file")
 
         # Get the folder id from the object for the reverse url
-        fid = self.object.folder.id
-        if fid:
-            return reverse('folders-view', args=(fid,))
+        if self.object.folder:
+            return reverse('folders-view', args=(self.object.folder.id,))
         else:
             return reverse('folders-list')
 
@@ -54,6 +54,7 @@ class UpdateReportView(UpdateView):
 
     model = Report
     template_name = 'report_edit.html'
+    form_class = ReportForm
 
     def get_success_url(self):
         # Save each file associated with the report
@@ -62,13 +63,11 @@ class UpdateReportView(UpdateView):
             m.save()
 
         # Get the folder id from the object for the reverse url
-        fid = self.object.folder.id
-        if fid:
-            return reverse('folders-view', args=(fid,))
+        if self.object.folder:
+            return reverse('folders-view', args=(self.object.folder.id,))
         else:
             return reverse('folders-list')
     def get_context_data(self, **kwargs):
-
         context = super(UpdateReportView, self).get_context_data(**kwargs)
         context['action'] = reverse('report-edit', kwargs={'pk': self.get_object().id})
         context['file_list'] =  Media.objects.filter(report__id=self.object.id)
@@ -142,6 +141,7 @@ class FolderView(DetailView):
     model = Folder
     template_name = 'folder.html'
 
+"""
 class EditFolderFileView(UpdateView):
 
     model = Folder
@@ -151,7 +151,7 @@ class EditFolderFileView(UpdateView):
     def get_success_url(self):
 
         return self.get_object().get_absolute_url()
-
+"""
 """
 def report(request):
     return render(request, 'enter_report.html', {})
