@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib import admin
 
 import secure_witness.views
-from secure_witness.views import report, submit
+from secure_witness.views import report, submit, saved
 
 
 
@@ -27,11 +27,25 @@ urlpatterns = patterns('',
     #/1/
     url(r'^(?P<pk>\d+)/$', secure_witness.views.FolderView.as_view(),
         name='folders-view',),
-    #/edit/1/files
-    url(r'^edit/(?P<pk>\d+)/files$', secure_witness.views.EditFolderFileView.as_view(),
-        name='folders-edit-files',),
+    #/1/report/
+    url(r'^report/$', secure_witness.views.CreateReportView.as_view(),
+        name='reports-new',), 
+
+    #saved
+    url(r'^saved/$', saved,
+        name='saved',),
+    #/rep/5/
+    url(r'^rep/(?P<pk>\d+)/$', secure_witness.views.ReportView.as_view(),
+        name='report-detail',),
+
+    #/deleterep/5/    
+    url(r'^deleterep/(?P<pk>\d+)/$', secure_witness.views.DeleteReportView.as_view(),
+        name='reports-delete',),
+
+    url(r'^editrep/(?P<pk>\d+)/$', secure_witness.views.UpdateReportView.as_view(),
+        name='report-edit',),
     #/report/
-    url(r'^report/', report, name='report-new'),
+    #url(r'^report/', report, name='report-new'),
     #/submit/
     url(r'^submit$', submit),
     #/register/

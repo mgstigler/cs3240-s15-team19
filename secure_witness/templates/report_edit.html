@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if report.id %}
+<a href="{% url "reports-delete" pk=report.id %}">Delete</a>
+{% endif %}
+{% if report.id %}
+<h1>Edit Report</h1>
+{% else %}
+<h1>Add Report</h1>
+{% endif %}
+
+<form action="{{ action }}" method="POST">
+  {% csrf_token %}
+  <ul>
+    {{ form.as_ul }}
+  </ul>
+  <input id="save_report" type="submit" value="Save" />
+</form>
+
+{% endblock %}
