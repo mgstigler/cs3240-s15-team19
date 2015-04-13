@@ -4,8 +4,12 @@
 
 <h1>{{ report }}</h1>
 
-<p>Folder Name: {{ report.short }}</p>
-<p>Folder ID: {{ folder.detailed }}</p>
-
+<p>{{ report.short }}</p>
+<p>Time: {{ report.today }}</p>
+<p>Detailed Description: {{ report.detailed }}</p>
+<p>Location: {{ report.location }}</p>
+<p>Time: {{ report.time }}</p>
+<p>Keywords: {{ report.keywords }}</p>
+<p>Privacy: {{ report.private }}</p>
 
 {% endblock %}

@@ -6,13 +6,13 @@ from django.forms.models import inlineformset_factory
 
 from secure_witness.models import (
     Folder,
-    File,
+    Report,
 )
 
 
 FolderFileFormSet = inlineformset_factory(
     Folder,
-    File,
+    Report,
 )
 
 

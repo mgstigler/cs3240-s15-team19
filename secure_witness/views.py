@@ -10,10 +10,63 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 
 from secure_witness import forms
-from secure_witness.models import Folder, File
+from secure_witness.models import Folder, Report
 from secure_witness.forms import UserForm
 
 
+def saved(request):
+    return HttpResponse("saved")
+
+class ListReportView(ListView):
+
+    model = Report
+    template_name = 'report_list.html'
+    context_object_name = "report_list"
+
+class CreateReportView(CreateView):
+
+    model = Report
+    template_name = 'report_edit.html'
+
+    def get_success_url(self):
+        return reverse('saved')
+    def get_context_data(self, **kwargs):
+
+        context = super(CreateReportView, self).get_context_data(**kwargs)
+        context['action'] = reverse('reports-new')
+
+        return context
+
+class UpdateReportView(UpdateView):
+
+    model = Report
+    template_name = 'report_edit.html'
+
+    def get_success_url(self):
+        return reverse('reports-list')
+    def get_context_data(self, **kwargs):
+
+        context = super(UpdateReportView, self).get_context_data(**kwargs)
+        context['action'] = reverse('report-edit',
+                                    kwargs={'pk': self.get_object().id})
+
+        return context
+
+class DeleteReportView(DeleteView):
+
+    model = Report
+    template_name = 'report_delete.html'
+
+    def get_success_url(self):
+        return reverse('reports-list')
+
+class ReportView(DetailView):
+
+    model = Report
+    template_name = 'report.html'
+
+
+    ########
 
 
 class ListFolderView(ListView):
@@ -75,6 +128,7 @@ class EditFolderFileView(UpdateView):
 def report(request):
     return render(request, 'enter_report.html', {})
 
+
 def submit(request):
     s = request.POST.get('short_description')
     d = request.POST.get('detailed_description')
@@ -90,7 +144,7 @@ def submit(request):
     rep = File(short=s, detailed=d, location=l, keywords=k, today=i, private=priv)
     rep.save()
     all = File.objects.all() #filter(short='short')
-    return HttpResponse(str(all))
+    return HttpResponse(all)
 
 
 def user_login(request):
