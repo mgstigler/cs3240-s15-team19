@@ -11,8 +11,13 @@
 <p>Time: {{ report.time }}</p>
 <p>Keywords: {{ report.keywords }}</p>
 <p>Privacy: {{ report.private }}</p>
+Files:
+<ul>
+{% for file in file_list %}
+    <li>{{ file.filename }}</li>
+{% endfor %}
+</ul>
 
-<a href="{% url "report-edit" pk=report.id %}">Edit Report</a>
-</b>
+<a href="{% url "report-edit" pk=report.id %}">Edit Report</a><br/>
 <a href="{% url "folders-list" %}">Back to List</a>
 {% endblock %}

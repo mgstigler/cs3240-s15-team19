@@ -30,6 +30,13 @@ class CreateReportView(CreateView):
     template_name = 'report_edit.html'
 
     def get_success_url(self):
+        # Save each file associated with the report
+        for file in self.request.FILES.getlist('files'):
+            m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object)
+            m.save()
+            print("Saved file")
+
+        # Get the folder id from the object for the reverse url
         fid = self.object.folder.id
         if fid:
             return reverse('folders-view', args=(fid,))
@@ -49,6 +56,12 @@ class UpdateReportView(UpdateView):
     template_name = 'report_edit.html'
 
     def get_success_url(self):
+        # Save each file associated with the report
+        for file in self.request.FILES.getlist('files'):
+            m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object)
+            m.save()
+
+        # Get the folder id from the object for the reverse url
         fid = self.object.folder.id
         if fid:
             return reverse('folders-view', args=(fid,))
@@ -57,9 +70,8 @@ class UpdateReportView(UpdateView):
     def get_context_data(self, **kwargs):
 
         context = super(UpdateReportView, self).get_context_data(**kwargs)
-        context['action'] = reverse('report-edit',
-                                    kwargs={'pk': self.get_object().id})
-
+        context['action'] = reverse('report-edit', kwargs={'pk': self.get_object().id})
+        context['file_list'] =  Media.objects.filter(report__id=self.object.id)
         return context
 
 class DeleteReportView(DeleteView):
@@ -79,6 +91,10 @@ class ReportView(DetailView):
     model = Report
     template_name = 'report.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(ReportView, self).get_context_data(**kwargs)
+        context['file_list'] =  Media.objects.filter(report__id=self.object.id)
+        return context
 
 class ListFolderView(ListView):
     model = Folder

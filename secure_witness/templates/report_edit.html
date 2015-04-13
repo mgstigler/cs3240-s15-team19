@@ -11,12 +11,29 @@
 <h1>Add Report</h1>
 {% endif %}
 
-<form action="{{ action }}" method="POST">
-  {% csrf_token %}
-  <ul>
-    {{ form.as_ul }}
-  </ul>
-  <input id="save_report" type="submit" value="Save" />
+<form action="{{ action }}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input multiple type="file" name="files" id="file-input"/><br/>
+    <ul id="file-list">
+        {% for file in file_list %}
+            <li>{{ file.filename }}</li>
+        {% endfor %}
+    </ul>
+    <input id="save_report" type="submit" value="Save" />
 </form>
+
+<!-- Script to display the files -->
+<script type="text/javascript">
+    $(function() {
+        $("input:file").change(function() {
+            var fileListUl = $("#file-list");
+            fileListUl.empty();
+            for(var i = 0; i < this.files.length; i++) {
+                $("<li>" + this.files[i].name + "</li>").appendTo(fileListUl);
+            }
+        });
+    });
+</script>
 
 {% endblock %}
