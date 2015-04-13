@@ -17,6 +17,7 @@ from secure_witness.forms import UserForm
 def saved(request):
     return HttpResponse("saved")
 
+
 class ListReportView(ListView):
 
     model = Report
@@ -29,7 +30,12 @@ class CreateReportView(CreateView):
     template_name = 'report_edit.html'
 
     def get_success_url(self):
-        return reverse('saved')
+        fid = self.object.folder.id
+        if fid:
+            return reverse('folders-view', args=(fid,))
+        else:
+            return reverse('folders-list')
+
     def get_context_data(self, **kwargs):
 
         context = super(CreateReportView, self).get_context_data(**kwargs)
@@ -43,7 +49,11 @@ class UpdateReportView(UpdateView):
     template_name = 'report_edit.html'
 
     def get_success_url(self):
-        return reverse('reports-list')
+        fid = self.object.folder.id
+        if fid:
+            return reverse('folders-view', args=(fid,))
+        else:
+            return reverse('folders-list')
     def get_context_data(self, **kwargs):
 
         context = super(UpdateReportView, self).get_context_data(**kwargs)
@@ -55,10 +65,14 @@ class UpdateReportView(UpdateView):
 class DeleteReportView(DeleteView):
 
     model = Report
-    template_name = 'report_delete.html'
+    template_name = 'delete_report.html'
 
     def get_success_url(self):
-        return reverse('reports-list')
+        fid = self.object.folder.id
+        if fid:
+            return reverse('folders-view', args=(fid,))
+        else:
+            return reverse('folders-list')
 
 class ReportView(DetailView):
 

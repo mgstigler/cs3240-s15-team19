@@ -8,10 +8,6 @@ class Folder(models.Model):
     folder_name = models.CharField(
         max_length=255, null=True
     )
-    folder_id = models.CharField(
-        max_length=255, null=True
-
-    )
 
     def get_absolute_url(self):
 
@@ -20,10 +16,7 @@ class Folder(models.Model):
 
     def __str__(self):
 
-        return ' '.join([
-            self.folder_name,
-            self.folder_id,
-        ])
+        return self.folder_name
 
 class Keyword(models.Model):
    keywords = models.CharField(max_length=100, default='', null=True)
@@ -38,6 +31,7 @@ class Report(models.Model):
     keywords = models.CharField(max_length=1000, default='', null=True)
     #KWset = models.ManyToManyField(Keyword)
     private = models.BooleanField(default=False)
+
 
 
     def __str__(self):

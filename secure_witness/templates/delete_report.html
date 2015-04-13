@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Delete Report</h1>
+
+<p>Are you sure you want to delete the report {{ report }}?</p>
+
+<form action="{% url "reports-delete" pk=report.id %}" method="POST">
+  {% csrf_token %}
+
+  <input type="submit" value="Yes, delete." />
+  <a href="{% url "folders-list" %}">No, cancel.</a>
+</form>
+
+{% endblock %}
