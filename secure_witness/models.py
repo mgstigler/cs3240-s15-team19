@@ -25,14 +25,18 @@ class Folder(models.Model):
             self.folder_id,
         ])
 
-class File(models.Model):
-    folder = models.ForeignKey(Folder, null=True)
+class Keyword(models.Model):
+   keywords = models.CharField(max_length=100, default='', null=True)
+
+class Report(models.Model):
+    folder = models.ForeignKey(Folder)
     time = models.CharField(max_length=50, default='', null=True)
     short = models.CharField(max_length=200, default='', null=True)
     detailed = models.CharField(max_length=1000, default='', null=True)
     location = models.CharField(max_length=50, default='', null=True)
     today = models.CharField(max_length=1000, default='', null=True)
     keywords = models.CharField(max_length=1000, default='', null=True)
+    #KWset = models.ManyToManyField(Keyword)
     private = models.BooleanField(default=False)
 
 
@@ -47,7 +51,7 @@ class Media(models.Model):
     filename = models.CharField(max_length=200)
     is_encrypted = models.BooleanField(default=True)
     content = models.FileField()
-    report = models.ForeignKey('File')
+    report = models.ForeignKey('Report')
 
     def __str__(self):
         return self.filename

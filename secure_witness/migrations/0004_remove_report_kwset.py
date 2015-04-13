@@ -7,9 +7,12 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('secure_witness', '0002_auto_20150402_1439'),
-        ('secure_witness', '0006_auto_20150403_1934'),
+        ('secure_witness', '0003_auto_20150412_2319'),
     ]
 
     operations = [
+        migrations.RemoveField(
+            model_name='report',
+            name='KWset',
+        ),
     ]
