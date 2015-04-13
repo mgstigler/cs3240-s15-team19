@@ -43,6 +43,14 @@ class File(models.Model):
             self.detailed,
         ])
 
+class Media(models.Model):
+    filename = models.CharField(max_length=200)
+    is_encrypted = models.BooleanField(default=True)
+    content = models.FileField()
+    report = models.ForeignKey('File')
+
+    def __str__(self):
+        return self.filename
 
 class UserProfile(models.Model):
     # Link UserProfile to an instance of User

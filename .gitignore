@@ -67,3 +67,6 @@ settings.py
 # database
 *.sqlite3
 *.db
+
+# uploaded media
+media/

@@ -10,11 +10,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 
 from secure_witness import forms
-from secure_witness.models import Folder, File
+from secure_witness.models import Folder, File, Media
 from secure_witness.forms import UserForm
-
-
-
 
 class ListFolderView(ListView):
     model = Folder
@@ -89,6 +86,11 @@ def submit(request):
 
     rep = File(short=s, detailed=d, location=l, keywords=k, today=i, private=priv)
     rep.save()
+
+    # Save each file associated with the Report
+    for file in request.FILES.getlist('media'):
+        Media(filename=str(file), is_encrypted=p, content=file, report=rep).save()
+
     all = File.objects.all() #filter(short='short')
     return HttpResponse(str(all))
 
