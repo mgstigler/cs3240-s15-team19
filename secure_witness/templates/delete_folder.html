@@ -2,15 +2,19 @@
 
 {% block content %}
 
-<h1>Delete Folder</h1>
+<div class="container">
 
-<p>Are you sure you want to delete the folder {{ folder }}?</p>
+    <h1>Delete Folder</h1>
 
-<form action="{% url "folders-delete" pk=folder.id %}" method="POST">
-  {% csrf_token %}
+    <p>Are you sure you want to delete the folder {{ folder }}?</p>
 
-  <input type="submit" value="Yes, delete." />
-  <a href="{% url "folders-list" %}">No, cancel.</a>
-</form>
+    <form action="{% url "folders-delete" pk=folder.id %}" method="POST">
+      {% csrf_token %}
+
+      <input type="submit" value="Yes, delete." />
+      <a href="{% url "folders-list" %}">No, cancel.</a>
+    </form>
+
+</div>
 
 {% endblock %}
