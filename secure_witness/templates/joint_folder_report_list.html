@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container">
+    <ul>
+        {% for folder in folder_list %}
+            <li>{{ folder.folder_name }}</li>
+        {% endfor %}
+    </ul>
+    <ul>
+        {% for report in report_list %}
+            <li>{{ report.short }}</li>
+        {% endfor %}
+    </ul>
+    </div><!-- END CONTAINER -->
+
+{% endblock %}

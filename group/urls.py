@@ -75,6 +75,9 @@ urlpatterns = patterns('',
     #/groups/1/edit/remove-user/1
     url(r'^groups/(?P<group_id>\d+)/edit/remove-user/(?P<user_id>\d+)/$', secure_witness.views.remove_user,
         name='group-remove-user'),
+    #/browse/
+    url(r'browse/$', secure_witness.views.JointFolderReportView.as_view(),
+        name='browse')
 
 )
 

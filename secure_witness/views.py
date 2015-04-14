@@ -1,8 +1,4 @@
-from django.views.generic import ListView
-from django.views.generic import CreateView
-from django.views.generic import UpdateView
-from django.views.generic import DeleteView
-from django.views.generic import DetailView
+from django.views.generic import View, ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group, User
@@ -17,6 +13,14 @@ from secure_witness.forms import UserForm, ReportForm
 def saved(request):
     return HttpResponse("saved")
 
+class JointFolderReportView(View):
+    def get(self, request):
+        folder_list = Folder.objects.all()
+        report_list = Report.objects.all()
+        return render(request, 'joint_folder_report_list.html', {
+            'folder_list': folder_list,
+            'report_list': report_list,
+        })
 
 class ListReportView(ListView):
 
