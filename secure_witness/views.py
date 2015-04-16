@@ -14,12 +14,24 @@ def saved(request):
     return HttpResponse("saved")
 
 class JointFolderReportView(View):
-    def get(self, request):
-        folder_list = Folder.objects.all()
-        report_list = Report.objects.all()
-        return render(request, 'joint_folder_report_list.html', {
+    def get(self, request, folder_id):
+        # TODO FILTER BASED ON CURRENT USER
+        if folder_id:
+            # Load reports in a specific folder
+            folder_list = []
+            report_list = Report.objects.filter(folder__id=folder_id)
+            cur_folder_name = Folder.objects.filter(id=folder_id)[0].folder_name
+        else:
+            # Load all folders and reports
+            folder_list = Folder.objects.all().order_by('folder_name')
+            report_list = Report.objects.filter(folder__id=None).order_by('short')
+            cur_folder_name = None
+
+        # Render the page with the appropriate data
+        return render(request, 'combined_folder_report_list.html', {
             'folder_list': folder_list,
             'report_list': report_list,
+            'cur_folder_name': cur_folder_name,
         })
 
 class ListReportView(ListView):
