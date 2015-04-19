@@ -46,12 +46,17 @@ class CreateReportView(CreateView):
     template_name = 'report_edit.html'
     form_class = ReportForm
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.updated_by = self.request.user
+        return super(CreateReportView, self).form_valid(form)
+
     def get_success_url(self):
         # Save each file associated with the report
         for file in self.request.FILES.getlist('files'):
-            m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object)
+            m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object,
+                      created_by=self.request.user, updated_by=self.request.user)
             m.save()
-            print("Saved file")
 
         # Get the folder id from the object for the reverse url
         if self.object.folder:
@@ -71,6 +76,10 @@ class UpdateReportView(UpdateView):
     model = Report
     template_name = 'report_edit.html'
     form_class = ReportForm
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super(UpdateReportView, self).form_valid(form)
 
     def get_success_url(self):
         # Save each file associated with the report
@@ -120,8 +129,14 @@ class CreateFolderView(CreateView):
     model = Folder
     template_name = 'edit_folder.html'
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.updated_by = self.request.user
+        return super(CreateFolderView, self).form_valid(form)
+
     def get_success_url(self):
         return reverse('folders-list')
+
     def get_context_data(self, **kwargs):
 
         context = super(CreateFolderView, self).get_context_data(**kwargs)
@@ -133,6 +148,10 @@ class UpdateFolderView(UpdateView):
 
     model = Folder
     template_name = 'edit_folder.html'
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super(UpdateFolderView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('folders-list')

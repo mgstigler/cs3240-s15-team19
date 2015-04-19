@@ -1,9 +1,27 @@
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
-class Folder(models.Model):
+class BaseModel(models.Model):
+    """
+    Base class to hold meta data about other models
+    """
+    created_by = models.ForeignKey(User, related_name='created_by', editable=False)
+    updated_by = models.ForeignKey(User, related_name='updated_by', editable=False)
+    created_at = models.DateTimeField(editable=False)
+    updated_at = models.DateTimeField(editable=False)
+
+    # Override the save function to store the date
+    # Do this instead of auto_created, etc. for better reliability
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.created_at = timezone.now()
+        self.updated_at = timezone.now()
+        return super(BaseModel, self).save(*args, **kwargs)
+
+class Folder(BaseModel):
 
     folder_name = models.CharField(
         max_length=255, null=True
@@ -21,7 +39,7 @@ class Folder(models.Model):
 class Keyword(models.Model):
    keywords = models.CharField(max_length=100, default='', null=True)
 
-class Report(models.Model):
+class Report(BaseModel):
     folder = models.ForeignKey(Folder, null=True)
     time = models.DateField(max_length=50, null=True)
     short = models.CharField(max_length=200, default='', null=True)
@@ -41,7 +59,7 @@ class Report(models.Model):
             self.detailed,
         ])
 
-class Media(models.Model):
+class Media(BaseModel):
     filename = models.CharField(max_length=200)
     is_encrypted = models.BooleanField(default=True)
     content = models.FileField()
