@@ -18,7 +18,12 @@
             <a href="{% url 'browse' folder_id=folder.id %}" class="list-group-item">
                 <span class="col-md-1 text-center glyphicon glyphicon-folder-close"></span>
                 {{ folder.folder_name }}
-                <span class="col-md-3 pull-right">{{ folder.updated_at|date:"n/j/y G:i" }}</span>
+                <div class="pull-right col-md-4">
+                    <div class="row">
+                        <span class="col-md-6 text-center">{{ folder.updated_at|date:"n/j/y G:i" }}</span>
+                        <span class="col-md-6 text-center">{{ folder.updated_by.username }}</span>
+                    </div>
+                </div>
             </a>
         {% endfor %}
 
@@ -26,7 +31,12 @@
             <a href="{% url 'report-detail' pk=report.id %}" class="list-group-item">
                 <span class="col-md-1 text-center glyphicon glyphicon-file"></span>
                 {{ report.short }}
-                <span class="col-md-3 pull-right">{{ report.updated_at|date:"n/j/y G:i" }}</span>
+                <div class="pull-right col-md-4">
+                    <div class="row">
+                        <span class="col-md-6 text-center">{{ report.updated_at|date:"n/j/y G:i" }}</span>
+                        <span class="col-md-6 text-center">{{ report.updated_by.username }}</span>
+                    </div>
+                </div>
             </a>
         {% endfor %}
         <a class="list-group-item text-center" href="{% url 'reports-new' %}">

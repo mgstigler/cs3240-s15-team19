@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group, User
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
 from secure_witness import forms
 from secure_witness.models import Folder, Media, Report
@@ -19,12 +20,16 @@ class JointFolderReportView(View):
         if folder_id:
             # Load reports in a specific folder
             folder_list = []
-            report_list = Report.objects.filter(folder__id=folder_id)
+            # Only retrieve public reports or ones that the user owns
+            query = Q(private=False) | Q(created_by=self.request.user)
+            report_list = Report.objects.filter(Q(folder__id=folder_id), query).order_by('short')
             cur_folder_name = Folder.objects.filter(id=folder_id)[0].folder_name
         else:
             # Load all folders and reports
             folder_list = Folder.objects.all().order_by('folder_name')
-            report_list = Report.objects.filter(folder__id=None).order_by('short')
+            # Only retrieve public reports or ones that the user owns
+            query = Q(private=False) | Q(created_by=self.request.user)
+            report_list = Report.objects.filter(Q(folder__id=None), query).order_by('short')
             cur_folder_name = None
 
         # Render the page with the appropriate data
