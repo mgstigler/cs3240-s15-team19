@@ -15,27 +15,51 @@
     <div class="list-group">
 
         {% for folder in folder_list %}
-            <a href="{% url 'browse' folder_id=folder.id %}" class="list-group-item">
+            <a href="{% url 'browse' folder_id=folder.id %}" class="list-group-item clearfix">
                 <span class="col-md-1 text-center glyphicon glyphicon-folder-close"></span>
                 {{ folder.folder_name }}
                 <div class="pull-right col-md-4">
                     <div class="row">
-                        <span class="col-md-6 text-center">{{ folder.updated_at|date:"n/j/y G:i" }}</span>
-                        <span class="col-md-6 text-center">{{ folder.updated_by.username }}</span>
-                    </div>
+                        <span class="col-md-4 text-center">{{ folder.updated_at|date:"n/j/y G:i" }}</span>
+                        <span class="col-md-4 text-center">{{ folder.updated_by.username }}</span>
+                        <form class="col-md-2 text-center" style="display: inline" action="{% url 'folders-edit' pk=folder.id %}">
+                            <button class="btn btn-primary" type="submit">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </button>
+                        </form>
+                        {% if is_admin %}
+                        <form class="col-md-2 text-center" style="display: inline" action="{% url 'folders-delete' pk=folder.id %}">
+                            <button class="btn btn-danger" type="submit">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div><!-- END ROW -->
                 </div>
             </a>
         {% endfor %}
 
         {% for report in report_list %}
-            <a href="{% url 'report-detail' pk=report.id %}" class="list-group-item">
+            <a href="{% url 'report-detail' pk=report.id %}" class="list-group-item clearfix">
                 <span class="col-md-1 text-center glyphicon glyphicon-file"></span>
                 {{ report.short }}
                 <div class="pull-right col-md-4">
                     <div class="row">
-                        <span class="col-md-6 text-center">{{ report.updated_at|date:"n/j/y G:i" }}</span>
-                        <span class="col-md-6 text-center">{{ report.updated_by.username }}</span>
-                    </div>
+                        <span class="col-md-4 text-center">{{ report.updated_at|date:"n/j/y G:i" }}</span>
+                        <span class="col-md-4 text-center">{{ report.updated_by.username }}</span>
+                        <form class="col-md-2 text-center" style="display: inline" action="{% url 'report-edit' pk=report.id %}">
+                            <button class="btn btn-primary" type="submit">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </button>
+                        </form>
+                        {% if is_admin %}
+                        <form class="col-md-2 text-center" style="display: inline" action="{% url 'reports-delete' pk=report.id %}">
+                            <button class="btn btn-danger" type="submit">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div><!-- END ROW -->
                 </div>
             </a>
         {% endfor %}

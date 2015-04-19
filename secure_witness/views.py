@@ -32,11 +32,14 @@ class JointFolderReportView(View):
             report_list = Report.objects.filter(Q(folder__id=None), query).order_by('short')
             cur_folder_name = None
 
+        is_admin = request.user.groups.filter(name='admins').exists()
+
         # Render the page with the appropriate data
         return render(request, 'combined_folder_report_list.html', {
             'folder_list': folder_list,
             'report_list': report_list,
             'cur_folder_name': cur_folder_name,
+            'is_admin': is_admin
         })
 
 class ListReportView(ListView):
