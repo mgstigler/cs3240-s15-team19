@@ -400,3 +400,19 @@ def remove_user(request, group_id, user_id):
     g.user_set.remove(u)
 
     return HttpResponseRedirect(reverse('group-edit', args=(group_id,)))
+
+class AdminUserManager(View):
+    def get(self, request):
+        # Load the users onto the page
+        user_list = User.objects.all().order_by('username')
+        return render(request, 'user_manager_list.html', {
+            'user_list': user_list,
+        })
+
+def switch_user_active(request, user_id):
+    user_id = int(user_id)
+    user = User.objects.get(id=user_id)
+    user.is_active = (not user.is_active)
+    user.save()
+
+    return HttpResponseRedirect('/user-manager/')
