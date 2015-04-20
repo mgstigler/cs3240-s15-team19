@@ -1,8 +1,4 @@
-from django.views.generic import ListView
-from django.views.generic import CreateView
-from django.views.generic import UpdateView
-from django.views.generic import DeleteView
-from django.views.generic import DetailView
+from django.views.generic import View, ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group, User
@@ -31,6 +27,27 @@ def copy(request, pk):
     fld.pk = None
     fld.save()
     return HttpResponseRedirect(reverse('report-detail', args=(fld.id,)))
+
+class JointFolderReportView(View):
+    def get(self, request, folder_id):
+        # TODO FILTER BASED ON CURRENT USER
+        if folder_id:
+            # Load reports in a specific folder
+            folder_list = []
+            report_list = Report.objects.filter(folder__id=folder_id)
+            cur_folder_name = Folder.objects.filter(id=folder_id)[0].folder_name
+        else:
+            # Load all folders and reports
+            folder_list = Folder.objects.all().order_by('folder_name')
+            report_list = Report.objects.filter(folder__id=None).order_by('short')
+            cur_folder_name = None
+
+        # Render the page with the appropriate data
+        return render(request, 'combined_folder_report_list.html', {
+            'folder_list': folder_list,
+            'report_list': report_list,
+            'cur_folder_name': cur_folder_name,
+        })
 
 
 class ListReportView(ListView):
@@ -195,10 +212,31 @@ def submit(request):
 
     # Save each file associated with the Report
     for file in request.FILES.getlist('media'):
-        Media(filename=str(file), is_encrypted=p, content=file, report=rep).save()
+        if priv==True:
+            new_iv = Random.new().read(DES3.block_size)  # get_random_bytes(8)
+            new_key = Random.new().read(DES3.key_size[-1])  # get_random_bytes(16)
+            in_filename = str(file)
+            spot = in_filename.index(".")
+            out_filename = in_filename[0:spot] + ".enc"
+            encrypt_file(in_filename, out_filename, 8192, new_key, new_iv)
+            Media(filename=in_filename, is_encrypted=p, content=out_filename, report=rep, key=new_key, iv=new_iv).save()
+        else:
+           Media(filename=str(file), is_encrypted=p, content=file, report=rep, key=0, iv=0).save()
 
     all = File.objects.all() #filter(short='short')
     return HttpResponse(all)
+
+def encrypt_file(in_filename, out_filename, chunk_size, key, iv):
+    des3 = DES3.new(key, DES3.MODE_CFB, iv)
+    with open(in_filename, 'rb') as in_file:
+        with open(out_filename, 'wb') as out_file:
+            while True:
+                chunk = in_file.read(chunk_size)
+                if len(chunk) == 0:
+                    break
+                elif len(chunk) % 16 != 0:
+                    chunk += b"\0" * (16 - len(chunk) % 16)
+                out_file.write(des3.encrypt(chunk))
 """
 
 def user_login(request):

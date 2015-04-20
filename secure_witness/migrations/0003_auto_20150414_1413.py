@@ -14,10 +14,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Media',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, primary_key=True, auto_created=True)),
                 ('filename', models.CharField(max_length=200)),
                 ('is_encrypted', models.BooleanField(default=True)),
                 ('content', models.FileField(upload_to='')),
+                ('key', models.CharField(max_length=200)),
+                ('iv', models.CharField(max_length=200)),
                 ('report', models.ForeignKey(to='secure_witness.Report')),
             ],
             options={
@@ -42,55 +44,55 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='keyword',
             name='keywords',
-            field=models.CharField(max_length=100, null=True, default=''),
+            field=models.CharField(default='', null=True, max_length=100),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='report',
             name='keywords',
-            field=models.CharField(max_length=1000, null=True, default=''),
+            field=models.CharField(default='', null=True, max_length=1000),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='report',
             name='today',
-            field=models.CharField(max_length=1000, null=True, default=''),
+            field=models.CharField(default='', null=True, max_length=1000),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='folder',
             name='folder_name',
-            field=models.CharField(max_length=255, null=True),
+            field=models.CharField(null=True, max_length=255),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='report',
             name='detailed',
-            field=models.CharField(max_length=1000, null=True, default=''),
+            field=models.CharField(default='', null=True, max_length=1000),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='report',
             name='folder',
-            field=models.ForeignKey(null=True, to='secure_witness.Folder'),
+            field=models.ForeignKey(to='secure_witness.Folder', null=True),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='report',
             name='location',
-            field=models.CharField(max_length=50, null=True, default=''),
+            field=models.CharField(default='', null=True, max_length=50),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='report',
             name='short',
-            field=models.CharField(max_length=200, null=True, default=''),
+            field=models.CharField(default='', null=True, max_length=200),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='report',
             name='time',
-            field=models.DateField(max_length=50, null=True),
+            field=models.DateField(null=True, max_length=50),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(

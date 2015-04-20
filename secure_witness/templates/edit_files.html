@@ -2,23 +2,26 @@
 
 {% block content %}
 
-<h1>Edit Files</h1>
+<div class="container">
+    <h1>Edit Files</h1>
 
-<p>Editing files for {{ folder }}</p>
+    <p>Editing files for {{ folder }}</p>
 
-<form action="{% url "folders-edit-files" pk=folder.id %}"
-      method="POST">
-    {% csrf_token %}
-    {{ form.management_form }}
-    {% for file_form in form %}
+    <form action="{% url "folders-edit-files" pk=folder.id %}"
+          method="POST">
+        {% csrf_token %}
+        {{ form.management_form }}
+        {% for file_form in form %}
 
-        <ul>
-        {{ file_form.as_ul }}
-        </ul>
+            <ul>
+            {{ file_form.as_ul }}
+            </ul>
 
-    {% endfor %}
+        {% endfor %}
 
-    <input type="submit" value="Save" />
-</form>
+        <input type="submit" value="Save" />
+    </form>
+
+</div>
 
 {% endblock %}
