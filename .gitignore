@@ -21,6 +21,9 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+venv
+*.pyc
+staticfiles
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -54,7 +57,7 @@ docs/_build/
 target/
 
 #files to ignore
-settings.py
+
  
 #extensions to ignore
 *.log

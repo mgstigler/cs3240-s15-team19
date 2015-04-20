@@ -1,26 +1,34 @@
+{% load app_filters %}
+
 <div class="navbar navbar-default">
     <div class="container container-fluid">
         <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
+            <li>
+                <form class="navbar-form" method="GET" action="{% url 'search' %}">
+                  <input class="form-control" type="text" placeholder="Search" name="q" />
+                  <input class="btn btn-default" type="submit" />
+                </form>
+            </li>
 
-
-
-            <li><a href="{% url 'browse' %}">Browse</a></li>
-
-            <li><a href="{% url 'reports-new' %}">Add a Report</a></li>
-
-            <!-- Folders Dropdown -->
+            <!-- Browse Dropdown -->
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                    Folders <span class="caret"></span>
+                    Reports &amp; Folders<span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href="{% url 'folders-list' %}">Folders</a></li>
-                    <li><a href="{% url 'folders-new' %}">Add</a></li>
+                    <li><a href="{% url 'browse' %}">Browse</a></li>
+                    <li><a href="{% url 'folders-new' %}">Add a Folder</a></li>
+                    <li><a href="{% url 'reports-new' %}">Add a Report</a></li>
                 </ul>
             </li>
 
             <li><a href="{% url 'group-list' %}">Groups</a></li>
+
+            <!-- Admin-only user manager -->
+            {% if user|has_group:"admins" %}
+            <li><a href="{% url 'user-manager' %}">User Manager</a></li>
+            {% endif %}
 
             <!-- Account Settings Dropdown -->
            

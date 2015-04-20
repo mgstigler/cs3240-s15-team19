@@ -12,9 +12,6 @@ from secure_witness.views import saved
 urlpatterns = patterns('',
     #/admin/
     url(r'^admin/', include(admin.site.urls)),
-    #/
-    url(r'^$', secure_witness.views.ListFolderView.as_view(),
-        name='folders-list',),
     #/new/
     url(r'^new$', secure_witness.views.CreateFolderView.as_view(),
         name='folders-new',),
@@ -83,7 +80,11 @@ urlpatterns = patterns('',
 
     #/browse/
     url(r'browse/(?P<folder_id>\d+)?$', secure_witness.views.JointFolderReportView.as_view(),
-        name='browse')
+        name='browse'),
+    url(r'user-manager/$', secure_witness.views.AdminUserManager.as_view(),
+        name='user-manager'),
+    url(r'user-manager/(?P<user_id>\d+)$', secure_witness.views.switch_user_active,
+        name='user-manager-activate')
 
 
 )

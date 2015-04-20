@@ -4,8 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group, User
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
-from secure_witness import forms
 from secure_witness.models import Folder, Media, Report
 from secure_witness.forms import UserForm, ReportForm
 
@@ -25,6 +25,7 @@ def saved(request):
 def copy(request, pk):
     fld = Report.objects.get(id=pk)
     fld.pk = None
+    fld.id = None
     fld.save()
     return HttpResponseRedirect(reverse('report-detail', args=(fld.id,)))
 
@@ -34,28 +35,30 @@ class JointFolderReportView(View):
         if folder_id:
             # Load reports in a specific folder
             folder_list = []
-            report_list = Report.objects.filter(folder__id=folder_id)
+            # Only retrieve public reports or ones that the user owns
+            user_group_list = request.user.groups.all()
+            query = Q(private=False) | Q(created_by=self.request.user)
+            for g in user_group_list:
+                query |= Q(authorized_groups=g)
+            report_list = Report.objects.filter(Q(folder__id=folder_id), query).distinct().order_by('short')
             cur_folder_name = Folder.objects.filter(id=folder_id)[0].folder_name
         else:
             # Load all folders and reports
             folder_list = Folder.objects.all().order_by('folder_name')
-            report_list = Report.objects.filter(folder__id=None).order_by('short')
+            # Only retrieve public reports or ones that the user owns
+            query = Q(private=False) | Q(created_by=self.request.user)
+            report_list = Report.objects.filter(Q(folder__id=None), query).order_by('short')
             cur_folder_name = None
+
+        is_admin = request.user.groups.filter(name='admins').exists()
 
         # Render the page with the appropriate data
         return render(request, 'combined_folder_report_list.html', {
             'folder_list': folder_list,
             'report_list': report_list,
             'cur_folder_name': cur_folder_name,
+            'is_admin': is_admin
         })
-
-
-class ListReportView(ListView):
-
-    model = Report
-    template_name = 'report_list.html'
-    context_object_name = "report_list"
-
 
 class CreateReportView(CreateView):
 
@@ -63,18 +66,23 @@ class CreateReportView(CreateView):
     template_name = 'report_edit.html'
     form_class = ReportForm
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.updated_by = self.request.user
+        return super(CreateReportView, self).form_valid(form)
+
     def get_success_url(self):
         # Save each file associated with the report
         for file in self.request.FILES.getlist('files'):
-            m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object)
+            m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object,
+                      created_by=self.request.user, updated_by=self.request.user)
             m.save()
-            print("Saved file")
 
         # Get the folder id from the object for the reverse url
         if self.object.folder:
-            return reverse('folders-view', args=(self.object.folder.id,))
+            return reverse('browse', args=(self.object.folder.id,))
         else:
-            return reverse('folders-list')
+            return reverse('browse')
 
     def get_context_data(self, **kwargs):
 
@@ -89,6 +97,10 @@ class UpdateReportView(UpdateView):
     template_name = 'report_edit.html'
     form_class = ReportForm
 
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super(UpdateReportView, self).form_valid(form)
+
     def get_success_url(self):
         # Save each file associated with the report
         for file in self.request.FILES.getlist('files'):
@@ -97,9 +109,9 @@ class UpdateReportView(UpdateView):
 
         # Get the folder id from the object for the reverse url
         if self.object.folder:
-            return reverse('folders-view', args=(self.object.folder.id,))
+            return reverse('browse', args=(self.object.folder.id,))
         else:
-            return reverse('folders-list')
+            return reverse('browse')
     def get_context_data(self, **kwargs):
         context = super(UpdateReportView, self).get_context_data(**kwargs)
         context['action'] = reverse('report-edit', kwargs={'pk': self.get_object().id})
@@ -114,9 +126,9 @@ class DeleteReportView(DeleteView):
     def get_success_url(self):
         fid = self.object.folder.id
         if fid:
-            return reverse('folders-view', args=(fid,))
+            return reverse('browse', args=(fid,))
         else:
-            return reverse('folders-list')
+            return reverse('browse')
 
 class ReportView(DetailView):
 
@@ -128,19 +140,20 @@ class ReportView(DetailView):
         context['file_list'] =  Media.objects.filter(report__id=self.object.id)
         return context
 
-class ListFolderView(ListView):
-    model = Folder
-    fields = "__all__"
-    template_name = 'folder_list.html'
-
 class CreateFolderView(CreateView):
 
     model = Folder
     fields = "__all__"
     template_name = 'edit_folder.html'
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.updated_by = self.request.user
+        return super(CreateFolderView, self).form_valid(form)
+
     def get_success_url(self):
-        return reverse('folders-list')
+        return reverse('browse')
+
     def get_context_data(self, **kwargs):
 
         context = super(CreateFolderView, self).get_context_data(**kwargs)
@@ -154,8 +167,12 @@ class UpdateFolderView(UpdateView):
     fields = "__all__"
     template_name = 'edit_folder.html'
 
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super(UpdateFolderView, self).form_valid(form)
+
     def get_success_url(self):
-        return reverse('folders-list')
+        return reverse('browse')
     def get_context_data(self, **kwargs):
 
         context = super(UpdateFolderView, self).get_context_data(**kwargs)
@@ -171,7 +188,7 @@ class DeleteFolderView(DeleteView):
     template_name = 'delete_folder.html'
 
     def get_success_url(self):
-        return reverse('folders-list')
+        return reverse('browse')
 
 class FolderView(DetailView):
 
@@ -179,17 +196,6 @@ class FolderView(DetailView):
     fields = "__all__"
     template_name = 'folder.html'
 
-"""
-class EditFolderFileView(UpdateView):
-
-    model = Folder
-    template_name = 'enter_report.html'
-    form_class = forms.FolderFileFormSet
-
-    def get_success_url(self):
-
-        return self.get_object().get_absolute_url()
-"""
 """
 def report(request):
     return render(request, 'enter_report.html', {})
@@ -254,7 +260,7 @@ def user_login(request):
             if user.is_active:
                 login(request, user)
                 # Link to the post-login screen
-                return HttpResponseRedirect('/')
+                return HttpResponseRedirect('/browse/')
             else:
                 return HttpResponse("Account is disabled. Please contact the admin.")
 
@@ -271,7 +277,7 @@ def user_logout(request):
     # User must be logged in to reach this section, so can just logout
     logout(request)
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect('/login/')
 
 def register(request):
     # Indicate status of registration
@@ -395,3 +401,19 @@ def remove_user(request, group_id, user_id):
     g.user_set.remove(u)
 
     return HttpResponseRedirect(reverse('group-edit', args=(group_id,)))
+
+class AdminUserManager(View):
+    def get(self, request):
+        # Load the users onto the page
+        user_list = User.objects.all().order_by('username')
+        return render(request, 'user_manager_list.html', {
+            'user_list': user_list,
+        })
+
+def switch_user_active(request, user_id):
+    user_id = int(user_id)
+    user = User.objects.get(id=user_id)
+    user.is_active = (not user.is_active)
+    user.save()
+
+    return HttpResponseRedirect('/user-manager/')

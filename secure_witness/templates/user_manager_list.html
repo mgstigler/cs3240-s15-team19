@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    {% for user in user_list %}
+        <div class="pull-left col-md-4">
+            <div class="panel panel-default panel-body">
+                {{ user.username }}
+                {% if user.is_active %}
+                <a href="{% url 'user-manager-activate' user_id=user.id %}" class="btn btn-danger pull-right">Deactivate</a>
+                {% else %}
+                <a href="{% url 'user-manager-activate' user_id=user.id %}" class="btn btn-success pull-right">Activate</a>
+               {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+
+</div><!-- END CONTAINER -->
+{% endblock %}
