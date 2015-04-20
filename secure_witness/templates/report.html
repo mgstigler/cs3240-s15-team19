@@ -6,6 +6,11 @@
 
     <h1>{{ report }}</h1>
 
+
+<a href="{% url "report-edit" pk=report.id %}">Edit Report</a><br/>
+<a href="{% url "copy" pk=report.id %}">Copy Report</a><br/>
+<a href="{% url "folders-list" %}">Back to List</a>
+
     <p>{{ report.short }}</p>
     <p>Time: {{ report.today }}</p>
     <p>Detailed Description: {{ report.detailed }}</p>
@@ -24,4 +29,5 @@
     <a href="{% url "folders-list" %}">Back to List</a>
 
 </div>
+
 {% endblock %}
