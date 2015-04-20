@@ -1,18 +1,23 @@
-{% if folder.id %}
-<a href="{% url "folders-delete" pk=folder.id %}">Delete</a>
-{% endif %}
-{% if folder.id %}
-<h1>Edit Folder</h1>
-{% else %}
-<h1>Add Folder</h1>
-{% endif %}
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    {% if folder.id %}
+    <a href="{% url "folders-delete" pk=folder.id %}">Delete</a>
+    {% endif %}
+    {% if folder.id %}
+    <h1>Edit Folder</h1>
+    {% else %}
+    <h1>Add Folder</h1>
+    {% endif %}
 
-<form action="{{ action }}" method="POST">
-  {% csrf_token %}
-  <ul>
-    {{ form.as_ul }}
-  </ul>
-  <input id="save_folder" type="submit" value="Save" />
-</form>
+    <form action="{{ action }}" method="POST">
+      {% csrf_token %}
+      <ul>
+        {{ form.as_ul }}
+      </ul>
+      <input id="save_folder" type="submit" value="Save" />
+    </form>
 
-<a href="{% url "folders-list" %}">back to list</a>
+    <a href="{% url 'browse' %}">back to list</a>
+</div>
+{% endblock %}

@@ -6,7 +6,6 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 
-from secure_witness import forms
 from secure_witness.models import Folder, Media, Report
 from secure_witness.forms import UserForm, ReportForm
 
@@ -26,6 +25,7 @@ def saved(request):
 def copy(request, pk):
     fld = Report.objects.get(id=pk)
     fld.pk = None
+    fld.id = None
     fld.save()
     return HttpResponseRedirect(reverse('report-detail', args=(fld.id,)))
 
@@ -60,14 +60,6 @@ class JointFolderReportView(View):
             'is_admin': is_admin
         })
 
-
-class ListReportView(ListView):
-
-    model = Report
-    template_name = 'report_list.html'
-    context_object_name = "report_list"
-
-
 class CreateReportView(CreateView):
 
     model = Report
@@ -88,9 +80,9 @@ class CreateReportView(CreateView):
 
         # Get the folder id from the object for the reverse url
         if self.object.folder:
-            return reverse('folders-view', args=(self.object.folder.id,))
+            return reverse('browse', args=(self.object.folder.id,))
         else:
-            return reverse('folders-list')
+            return reverse('browse')
 
     def get_context_data(self, **kwargs):
 
@@ -117,9 +109,9 @@ class UpdateReportView(UpdateView):
 
         # Get the folder id from the object for the reverse url
         if self.object.folder:
-            return reverse('folders-view', args=(self.object.folder.id,))
+            return reverse('browse', args=(self.object.folder.id,))
         else:
-            return reverse('folders-list')
+            return reverse('browse')
     def get_context_data(self, **kwargs):
         context = super(UpdateReportView, self).get_context_data(**kwargs)
         context['action'] = reverse('report-edit', kwargs={'pk': self.get_object().id})
@@ -134,9 +126,9 @@ class DeleteReportView(DeleteView):
     def get_success_url(self):
         fid = self.object.folder.id
         if fid:
-            return reverse('folders-view', args=(fid,))
+            return reverse('browse', args=(fid,))
         else:
-            return reverse('folders-list')
+            return reverse('browse')
 
 class ReportView(DetailView):
 
@@ -147,11 +139,6 @@ class ReportView(DetailView):
         context = super(ReportView, self).get_context_data(**kwargs)
         context['file_list'] =  Media.objects.filter(report__id=self.object.id)
         return context
-
-class ListFolderView(ListView):
-    model = Folder
-    fields = "__all__"
-    template_name = 'folder_list.html'
 
 class CreateFolderView(CreateView):
 
@@ -165,7 +152,7 @@ class CreateFolderView(CreateView):
         return super(CreateFolderView, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse('folders-list')
+        return reverse('browse')
 
     def get_context_data(self, **kwargs):
 
@@ -185,7 +172,7 @@ class UpdateFolderView(UpdateView):
         return super(UpdateFolderView, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse('folders-list')
+        return reverse('browse')
     def get_context_data(self, **kwargs):
 
         context = super(UpdateFolderView, self).get_context_data(**kwargs)
@@ -201,7 +188,7 @@ class DeleteFolderView(DeleteView):
     template_name = 'delete_folder.html'
 
     def get_success_url(self):
-        return reverse('folders-list')
+        return reverse('browse')
 
 class FolderView(DetailView):
 
@@ -209,17 +196,6 @@ class FolderView(DetailView):
     fields = "__all__"
     template_name = 'folder.html'
 
-"""
-class EditFolderFileView(UpdateView):
-
-    model = Folder
-    template_name = 'enter_report.html'
-    form_class = forms.FolderFileFormSet
-
-    def get_success_url(self):
-
-        return self.get_object().get_absolute_url()
-"""
 """
 def report(request):
     return render(request, 'enter_report.html', {})
@@ -284,7 +260,7 @@ def user_login(request):
             if user.is_active:
                 login(request, user)
                 # Link to the post-login screen
-                return HttpResponseRedirect('/')
+                return HttpResponseRedirect('/browse/')
             else:
                 return HttpResponse("Account is disabled. Please contact the admin.")
 
@@ -301,7 +277,7 @@ def user_logout(request):
     # User must be logged in to reach this section, so can just logout
     logout(request)
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect('/login/')
 
 def register(request):
     # Indicate status of registration
