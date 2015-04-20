@@ -33,7 +33,9 @@ urlpatterns = patterns('',
 
     #saved
     url(r'^saved/$', saved,
-        name='saved',),
+        name='saved',), 
+    url(r'^copy/(?P<pk>\d+)/$', secure_witness.views.copy, name='copy'),
+
     #/rep/5/
     url(r'^rep/(?P<pk>\d+)/$', secure_witness.views.ReportView.as_view(),
         name='report-detail',),
@@ -75,6 +77,8 @@ urlpatterns = patterns('',
     #/groups/1/edit/remove-user/1
     url(r'^groups/(?P<group_id>\d+)/edit/remove-user/(?P<user_id>\d+)/$', secure_witness.views.remove_user,
         name='group-remove-user'),
+    url(r'^search/$', secure_witness.views.search, name='search' ),
+   
 
 )
 

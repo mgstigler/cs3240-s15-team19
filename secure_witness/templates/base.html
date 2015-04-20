@@ -7,15 +7,18 @@
     <!-- LOAD JS HERE SO THAT IT APPEARS BEFORE CONTENT BLOCK-->
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script><script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
     <!-- Load Bootstrap after JQuery -->
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
   </head>
-
   <body>
     {% include "navigation.html" %}
-
     {% block content %}
     {% endblock %}
+    <form method="GET" action="{% url 'search' %}">
+      <input type="text" name="q" />
+      <input type="submit" />
+    </form>
 
   </body>
 </html>

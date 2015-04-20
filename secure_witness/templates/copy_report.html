@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Copy Report</h1>
+
+<p>Are you sure you want to copy the report {{ report }}?</p>
+
+<form action="{% url "reports-copy" pk=report.id %}" method="POST">
+  {% csrf_token %}
+
+  <input type="submit" value="Yes, copy." />
+  <a href="{% url "folders-list" %}">No, cancel.</a>
+</form>
+
+{% endblock %}

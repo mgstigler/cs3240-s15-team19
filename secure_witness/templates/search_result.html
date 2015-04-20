@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Search Results</h1>
+
+    <ul>
+    {% for report in results %}
+        <li>
+            <a href="{% url 'report-detail' pk=report.id %}">{{ report.short }}</a><br />
+        </li>
+    {% endfor %}
+    </ul>
+
+
+{% endblock %}

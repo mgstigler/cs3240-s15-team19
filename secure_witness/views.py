@@ -14,8 +14,23 @@ from secure_witness.models import Folder, Media, Report
 from secure_witness.forms import UserForm, ReportForm
 
 
+
+def search(request):
+    query = request.GET.get('q')
+    if query:
+        results = Report.objects.filter(keywords__icontains=query)
+    else:
+        results = Report.objects.all()
+    return render(request, 'search_result.html', {'results':results})
+
 def saved(request):
     return HttpResponse("saved")
+
+def copy(request, pk):
+    fld = Report.objects.get(id=pk)
+    fld.pk = None
+    fld.save()
+    return HttpResponseRedirect(reverse('report-detail', args=(fld.id,)))
 
 
 class ListReportView(ListView):
@@ -23,6 +38,7 @@ class ListReportView(ListView):
     model = Report
     template_name = 'report_list.html'
     context_object_name = "report_list"
+
 
 class CreateReportView(CreateView):
 
@@ -97,11 +113,13 @@ class ReportView(DetailView):
 
 class ListFolderView(ListView):
     model = Folder
+    fields = "__all__"
     template_name = 'folder_list.html'
 
 class CreateFolderView(CreateView):
 
     model = Folder
+    fields = "__all__"
     template_name = 'edit_folder.html'
 
     def get_success_url(self):
@@ -116,6 +134,7 @@ class CreateFolderView(CreateView):
 class UpdateFolderView(UpdateView):
 
     model = Folder
+    fields = "__all__"
     template_name = 'edit_folder.html'
 
     def get_success_url(self):
@@ -131,6 +150,7 @@ class UpdateFolderView(UpdateView):
 class DeleteFolderView(DeleteView):
 
     model = Folder
+    fields = "__all__"
     template_name = 'delete_folder.html'
 
     def get_success_url(self):
@@ -139,6 +159,7 @@ class DeleteFolderView(DeleteView):
 class FolderView(DetailView):
 
     model = Folder
+    fields = "__all__"
     template_name = 'folder.html'
 
 """
