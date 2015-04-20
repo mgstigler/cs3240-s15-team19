@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.utils import timezone
 
 
@@ -49,8 +49,7 @@ class Report(BaseModel):
     keywords = models.CharField(max_length=1000, default='', null=True)
     #KWset = models.ManyToManyField(Keyword)
     private = models.BooleanField(default=False)
-
-
+    authorized_groups = models.ManyToManyField(Group, blank=True)
 
     def __str__(self):
 

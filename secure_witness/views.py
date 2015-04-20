@@ -21,8 +21,11 @@ class JointFolderReportView(View):
             # Load reports in a specific folder
             folder_list = []
             # Only retrieve public reports or ones that the user owns
+            user_group_list = request.user.groups.all()
             query = Q(private=False) | Q(created_by=self.request.user)
-            report_list = Report.objects.filter(Q(folder__id=folder_id), query).order_by('short')
+            for g in user_group_list:
+                query |= Q(authorized_groups=g)
+            report_list = Report.objects.filter(Q(folder__id=folder_id), query).distinct().order_by('short')
             cur_folder_name = Folder.objects.filter(id=folder_id)[0].folder_name
         else:
             # Load all folders and reports
