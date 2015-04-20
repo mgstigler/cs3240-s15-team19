@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h1>Delete Folder</h1>
+
+    <p>Are you sure you want to delete the folder {{ folder }}?</p>
+
+    <form action="{% url "folders-delete" pk=folder.id %}" method="POST">
+      {% csrf_token %}
+
+      <input type="submit" value="Yes, delete." />
+      <a href="{% url "folders-list" %}">No, cancel.</a>
+    </form>
+
+</div>
+
+{% endblock %}

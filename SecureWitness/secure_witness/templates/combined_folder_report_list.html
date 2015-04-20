@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+
+    <ol class="breadcrumb">
+        {% if cur_folder_name %}
+            <li><a href="{% url 'browse' %}">Home</a></li>
+            <li class="active">{{ cur_folder_name }}</li>
+        {% else %}
+            <li class="active">Home</li>
+        {% endif %}
+    </ol>
+
+    <div class="list-group">
+
+        {% for folder in folder_list %}
+            <a href="{% url 'browse' folder_id=folder.id %}" class="list-group-item">
+                <span class="col-md-1 text-center glyphicon glyphicon-folder-close"></span>
+                {{ folder.folder_name }}
+                <span class="col-md-2 pull-right">Update Date</span>
+            </a>
+        {% endfor %}
+
+        {% for report in report_list %}
+            <a href="{% url 'report-detail' pk=report.id %}" class="list-group-item">
+                <span class="col-md-1 text-center glyphicon glyphicon-file"></span>
+                {{ report.short }}
+                <span class="col-md-2 pull-right">Update Date</span>
+            </a>
+        {% endfor %}
+        <a class="list-group-item text-center" href="{% url 'reports-new' %}">
+            <span class="glyphicon glyphicon-plus"></span>
+            Create a New Report
+        </a>
+    </div>
+
+</div><!-- END CONTAINER -->
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container">
+    <h1>Manage Groups</h1>
+
+    <div class="list-group">
+    {% for group in group_list %}
+        <a class="list-group-item clearfix" href="{% url 'group-detail' pk=group.id %}">
+            {{ group.name }}
+            <span class="pull-right">
+                <form style="display: inline" action="{% url 'group-edit' pk=group.id %}">
+                    <button class="btn btn-primary" type="submit">Edit</button>
+                </form>
+                <!--
+                <form style="display: inline" action="{% url 'group-delete' pk=group.id %}">
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                </form>
+                -->
+            </span>
+        </a>
+    {% endfor %}
+        <a class="list-group-item text-center" href="{% url 'group-create' %}">
+            <span class="glyphicon glyphicon-plus"></span>
+            Create a New Group
+        </a>
+    </div>
+
+    </div>
+
+{% endblock %}

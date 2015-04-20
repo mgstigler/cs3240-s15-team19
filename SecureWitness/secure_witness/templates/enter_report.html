@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h3>Fill out the form below to create a new report</h3>
+    <form method="post" action="/submit" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        Enter report in folder: {{folder}}<br/>
+        Short description:<br/>
+        <textarea name='short_description' rows='4' cols='50' maxlength='100' required></textarea><br/>
+        <br/>
+        Detailed description:<br/>
+        <textarea name='detailed_description' rows='4' cols='50' maxlength='100' required></textarea><br/>
+        <br/>
+        Location of incident (optional):<br/>
+        <textarea name='location' rows='4' cols='50' maxlength='100' ></textarea><br/>
+        <br/>
+        Date of incident (optional):<br/>
+        <input type="datetime-local" name='incident_date'><br/>
+        <br/>
+        User-supplied keywords (optional):<br/>
+        <textarea name='keywords' rows='4' cols='50' maxlength='100' ></textarea><br/>
+        <br/>
+        One or more files (optional): <br/>
+        <input type="file" multiple="true" name="media" onchange="newInput();" /><br/>
+        <br/>
+        <input type="radio" name="privacy" value="public" checked>Public
+        <input type="radio" name="privacy" value="private">Private<br/>
+        <br/>
+
+        <input type='submit' value='Submit'/>
+    </form>
+
+</div>
+
+{% endblock %}

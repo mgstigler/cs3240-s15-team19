@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Register for Secure Witness</h1>
+    {% if registered %}
+        Thank you for registering! <br />
+    {% else %}
+        <form id="user_form" method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+
+            <!-- Display forms as <p> elements for formatting -->
+            {{ user_form.as_p }}
+
+            <input type="submit" name="Submit" value="Register" />
+        </form>
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h1>{{ folder }}</h1>
+
+    <p>Folder Name: {{ folder.folder_name }}</p>
+
+    <ul>
+    {%  for report in folder.report_set.all %}
+        <li>
+            <a href="{% url "report-detail" pk=report.id %}">{{ report.short }}</a>
+            (<a href="{% url "report-edit" pk=report.id %}">edit</a>)
+        </li>
+    {%  endfor %}
+    </ul>
+    <a href="{% url "reports-new" %}">Add a Report</a>
+    </b>
+    <a href="{% url "folders-list" %}">Back to List</a>
+
+</div>
+{% endblock %}
