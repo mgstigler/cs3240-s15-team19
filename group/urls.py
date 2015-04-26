@@ -36,9 +36,15 @@ urlpatterns = patterns('',
     #/rep/5/
     url(r'^rep/(?P<pk>\d+)/$', secure_witness.views.ReportView.as_view(),
         name='report-detail',),
-
+    #/rep/1/add-comment
     url(r'^rep/(?P<report_id>\d+)/add-comment$', secure_witness.views.add_comment,
         name='report-add-comment'),
+    #/rep/1/edit-comment
+    url(r'^rep/(?P<report_id>\d+)/edit-comment/(?P<pk>\d+)/$', secure_witness.views.CommentUpdateView.as_view(),
+        name='report-edit-comment'),
+    #/rep/1/delete-comment
+    url(r'rep/(?P<report_id>\d+)/delete-comment/(?P<pk>\d+)/$', secure_witness.views.CommentDeleteView.as_view(),
+        name='report-delete-comment'),
 
     #/deleterep/5/    
     url(r'^deleterep/(?P<pk>\d+)/$', secure_witness.views.DeleteReportView.as_view(),

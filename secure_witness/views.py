@@ -145,7 +145,7 @@ class ReportView(DetailView):
         context['file_list'] =  Media.objects.filter(report__id=self.object.id)
 
         # Get the list of comments associated with the report
-        context['comment_list'] = Comment.objects.filter(report__id=self.object.id)
+        context['comment_list'] = Comment.objects.filter(report__id=self.object.id).order_by('-created_at')
         return context
 
 class CreateFolderView(CreateView):
@@ -419,3 +419,23 @@ def add_comment(request, report_id):
 
         # Return to the report view
         return HttpResponseRedirect(reverse('report-detail', args=(report_id)))
+
+class CommentUpdateView(UpdateView):
+    model = Comment
+    fields = "__all__"
+    template_name = "comment_edit.html"
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super(CommentUpdateView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('report-detail', args=(self.object.report.id,))
+
+class CommentDeleteView(DeleteView):
+    model = Comment
+    fields = "__all__"
+    template_name = "comment_confirm_delete.html"
+
+    def get_success_url(self):
+        return reverse('report-detail', args=(self.object.report.id,))
