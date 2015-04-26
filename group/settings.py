@@ -83,7 +83,7 @@ USE_TZ = True
 LOGIN_EXEMPT_URLS = (
     '/register/',
     '/login/',
-    '/confirm/*',
+    '/admin/',
 )
 
 LOGIN_URL = '/login/'
