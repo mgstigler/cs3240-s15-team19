@@ -48,7 +48,7 @@ urlpatterns = patterns('',
     #/submit/
     #url(r'^submit$', submit),
     #/register/
-    url(r'^register/$', secure_witness.views.register, name='register'),
+    #url(r'^register/$', secure_witness.views.register, name='register'),
     #/login/
     url(r'^login/$', secure_witness.views.user_login, name='login'),
     #/logout/
@@ -84,8 +84,11 @@ urlpatterns = patterns('',
     url(r'user-manager/$', secure_witness.views.AdminUserManager.as_view(),
         name='user-manager'),
     url(r'user-manager/(?P<user_id>\d+)$', secure_witness.views.switch_user_active,
-        name='user-manager-activate')
+        name='user-manager-activate'),
 
+    #/sign_up/
+    url(r'^register/$', secure_witness.views.register_user, name='register-user'),
+    url(r'confirm/(?P<activation_key>\w+)/$', secure_witness.views.register_confirm, name='register-confirm'),
 
 )
 

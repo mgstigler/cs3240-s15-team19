@@ -74,7 +74,8 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User)
 
     # Extra fields aside from default user fields
-    # TODO Add extra fields if needed
+    activation_key = models.CharField(max_length=40, blank=True)
+    key_expires = models.DateTimeField(default=timezone.now())
 
     def __str__(self):
         return self.user.username

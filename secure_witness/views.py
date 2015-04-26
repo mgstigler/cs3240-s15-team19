@@ -1,14 +1,19 @@
 from django.views.generic import View, ListView, CreateView, UpdateView, DeleteView, DetailView
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group, User
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.core.mail import send_mail
+from django.core.context_processors import csrf
+from django.utils import timezone
+from django.template import RequestContext
 
-from secure_witness.models import Folder, Media, Report
-from secure_witness.forms import UserForm, ReportForm
+from secure_witness.models import Folder, Media, Report, UserProfile
+from secure_witness.forms import UserForm, ReportForm, RegistrationForm
 
+import hashlib, datetime, random
 
 
 def search(request):
@@ -310,6 +315,63 @@ def register(request):
         'user_form': user_form,
         'registered': registered,
     })
+
+def register_user(request):
+    args = {}
+    args.update(csrf(request))
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        args['form'] = form
+
+        if form.is_valid():
+            form.save()
+
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            random_string = str(random.random()).encode('utf8')
+            salt = hashlib.sha1(random_string).hexdigest()[:5]
+            salted = (salt + email).encode('utf8')
+            activation_key = hashlib.sha1(salted).hexdigest()
+            key_expires = timezone.now() + datetime.timedelta(2)
+
+            # Get the user
+            user = User.objects.get(username=username)
+
+            # Create new user profile
+            user_profile = UserProfile(user=user, activation_key=activation_key,
+                   key_expires=key_expires)
+            user_profile.save()
+
+            # Send activation email
+            email_subject = 'Account Confirmation'
+            email_body = "To activate your account, please visit: \
+                http://127.0.0.1:8000/confirm/%s" % (activation_key)
+
+            send_mail(email_subject, email_body, 'sdgennari@gmail.com', [email], fail_silently=False)
+
+            return HttpResponseRedirect('login')
+
+    else:
+        args['form'] = RegistrationForm()
+
+    return render_to_response('register.html', args, context_instance=RequestContext(request))
+
+def register_confirm(request, activation_key):
+    # If the user is already logged in, stop activation process
+    if request.user.is_authenticated():
+        HttpResponseRedirect('/browse')
+
+    # Check if a user with the activation_key exists
+    user_profile = get_object_or_404(UserProfile, activation_key=activation_key)
+
+    # Make sure the user has not expired
+    if user_profile.key_expires < timezone.now():
+        return HttpResponse("Activation key has expired. Please re-register")
+
+    user = user_profile.user
+    user.is_active = True
+    user.save()
+    return HttpResponse("Account confirmed")
 
 class GroupListView(ListView):
     context_object_name = "group_list"

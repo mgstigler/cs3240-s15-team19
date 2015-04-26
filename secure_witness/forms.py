@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.forms import UserCreationForm
 from secure_witness.models import UserProfile, Report
 from django.forms.models import inlineformset_factory
 
@@ -39,3 +40,31 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password']
+
+class RegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True, widget=forms.TextInput(attrs={'placeholder' : 'Email address'}))
+    first_name = forms.CharField(required=True)
+    last_name = forms.CharField(required=True)
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        # If no user exists, then the email is valid
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return email
+        # Otherwise, raise an exception
+        raise forms.ValidationError('Duplicate Email')
+
+    def save(self, commit=True):
+        user = super(RegistrationForm, self).save(commit=False)
+        user.email = self.cleaned_data["email"]
+        if commit:
+            user.is_active = False
+            user.save()
+
+        return user
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'username', 'password1', 'password2']

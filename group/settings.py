@@ -83,6 +83,7 @@ USE_TZ = True
 LOGIN_EXEMPT_URLS = (
     '/register/',
     '/login/',
+    '/confirm/*',
 )
 
 LOGIN_URL = '/login/'
@@ -107,6 +108,13 @@ MEDIA_URL = 'media/'
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
 )
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'g19securewitness@gmail.com'
+EMAIL_HOST_PASSWORD = 'g19password'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'g19securewitness@gmail.com'
 
 # Parse database configuration from $DATABASE_URL
 import dj_database_url
