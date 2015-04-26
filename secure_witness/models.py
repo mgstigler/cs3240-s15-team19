@@ -21,6 +21,12 @@ class BaseModel(models.Model):
         self.updated_at = timezone.now()
         return super(BaseModel, self).save(*args, **kwargs)
 
+class Comment(BaseModel):
+    report = models.ForeignKey('Report')
+
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=200)
+
 class Folder(BaseModel):
 
     folder_name = models.CharField(

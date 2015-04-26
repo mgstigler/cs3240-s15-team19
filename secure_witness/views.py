@@ -10,8 +10,8 @@ from django.core.context_processors import csrf
 from django.utils import timezone
 from django.template import RequestContext
 
-from secure_witness.models import Folder, Media, Report, UserProfile
-from secure_witness.forms import UserForm, ReportForm, RegistrationForm
+from secure_witness.models import *
+from secure_witness.forms import *
 
 import hashlib, datetime, random
 
@@ -143,6 +143,9 @@ class ReportView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ReportView, self).get_context_data(**kwargs)
         context['file_list'] =  Media.objects.filter(report__id=self.object.id)
+
+        # Get the list of comments associated with the report
+        context['comment_list'] = Comment.objects.filter(report__id=self.object.id)
         return context
 
 class CreateFolderView(CreateView):
@@ -398,3 +401,21 @@ def switch_user_active(request, user_id):
     user.save()
 
     return HttpResponseRedirect('/user-manager/')
+
+def add_comment(request, report_id):
+    if request.method == 'POST':
+        # Get the information from the post
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+
+        # Get the associated report
+        report = Report.objects.get(id=report_id)
+
+        # Create and save a comment with the new info
+        comment = Comment(title=title, description=description, report=report)
+        comment.created_by = request.user
+        comment.updated_by = request.user
+        comment.save()
+
+        # Return to the report view
+        return HttpResponseRedirect(reverse('report-detail', args=(report_id)))

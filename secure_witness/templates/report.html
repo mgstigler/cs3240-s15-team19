@@ -24,6 +24,24 @@
     <a href="{% url "copy" pk=report.id %}">Copy Report</a><br/>
     <a href="{% url 'browse' folder_id=report.folder.id %}">Back to List</a>
 
+    {% if report.id %}
+    <form id="add_comment_form" action="{% url 'report-add-comment' report_id=report.id %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Title" />
+        <input type="text" name="description" placeholder="Description" />
+        <input type="submit" value="Add Comment">
+    </form>
+    {% endif %}
+
+    <ul>
+    {% for comment in comment_list %}
+        <li>
+            {{ comment.title }}<br />
+            {{ comment.description }}
+        </li>
+    {% endfor %}
+    </ul>
+
 </div>
 
 {% endblock %}
