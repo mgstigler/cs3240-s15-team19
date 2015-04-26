@@ -10,13 +10,6 @@ from secure_witness.models import (
     Report,
 )
 
-"""
-FolderFileFormSet = inlineformset_factory(
-    Folder,
-    Report,
-)
-"""
-
 
 class ReportForm(forms.ModelForm):
 

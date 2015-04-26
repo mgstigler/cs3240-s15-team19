@@ -201,55 +201,6 @@ class FolderView(DetailView):
     fields = "__all__"
     template_name = 'folder.html'
 
-"""
-def report(request):
-    return render(request, 'enter_report.html', {})
-
-
-def submit(request):
-    s = request.POST.get('short_description')
-    d = request.POST.get('detailed_description')
-    l = request.POST.get('location')
-    k = request.POST.get('keywords')
-    i = request.POST.get('incident_date')
-    p = request.POST.get('privacy')
-
-    priv = False
-    if p == 'Private':
-        priv = True
-
-    rep = File(short=s, detailed=d, location=l, keywords=k, today=i, private=priv)
-    rep.save()
-
-    # Save each file associated with the Report
-    for file in request.FILES.getlist('media'):
-        if priv==True:
-            new_iv = Random.new().read(DES3.block_size)  # get_random_bytes(8)
-            new_key = Random.new().read(DES3.key_size[-1])  # get_random_bytes(16)
-            in_filename = str(file)
-            spot = in_filename.index(".")
-            out_filename = in_filename[0:spot] + ".enc"
-            encrypt_file(in_filename, out_filename, 8192, new_key, new_iv)
-            Media(filename=in_filename, is_encrypted=p, content=out_filename, report=rep, key=new_key, iv=new_iv).save()
-        else:
-           Media(filename=str(file), is_encrypted=p, content=file, report=rep, key=0, iv=0).save()
-
-    all = File.objects.all() #filter(short='short')
-    return HttpResponse(all)
-
-def encrypt_file(in_filename, out_filename, chunk_size, key, iv):
-    des3 = DES3.new(key, DES3.MODE_CFB, iv)
-    with open(in_filename, 'rb') as in_file:
-        with open(out_filename, 'wb') as out_file:
-            while True:
-                chunk = in_file.read(chunk_size)
-                if len(chunk) == 0:
-                    break
-                elif len(chunk) % 16 != 0:
-                    chunk += b"\0" * (16 - len(chunk) % 16)
-                out_file.write(des3.encrypt(chunk))
-"""
-
 def user_login(request):
     # Process data from POST
     if request.method == 'POST':
@@ -284,38 +235,6 @@ def user_logout(request):
 
     return HttpResponseRedirect('/login/')
 
-def register(request):
-    # Indicate status of registration
-    registered = False
-
-    # Process data from POST
-    if request.method == 'POST':
-        user_form = UserForm(data=request.POST)
-
-        if (user_form.is_valid()):
-            # Save the user_form to the database
-            user = user_form.save()
-
-            # Hash the password with set_password
-            user.set_password(user.password)
-            user.save()
-
-            # Registration finished successfully
-            registered = True
-
-        else:
-            print(user_form.errors)
-
-    # GET request, create a blank form
-    else:
-        user_form = UserForm()
-
-    # Return the appropriate request, created above
-    return render(request, 'register.html', {
-        'user_form': user_form,
-        'registered': registered,
-    })
-
 def register_user(request):
     args = {}
     args.update(csrf(request))
@@ -345,7 +264,7 @@ def register_user(request):
             # Send activation email
             email_subject = 'Account Confirmation'
             email_body = "To activate your account, please visit: \
-                http://127.0.0.1:8000/confirm/%s" % (activation_key)
+                /confirm/%s" % (activation_key)
 
             send_mail(email_subject, email_body, 'sdgennari@gmail.com', [email], fail_silently=False)
 

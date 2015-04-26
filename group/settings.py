@@ -109,6 +109,7 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
 )
 
+# Settings for the email account
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'g19securewitness@gmail.com'
 EMAIL_HOST_PASSWORD = 'g19password'
