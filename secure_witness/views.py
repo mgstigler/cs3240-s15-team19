@@ -435,7 +435,7 @@ def edit_profile(request):
                 return HttpResponse("Account is disabled. Please contact the admin.")
 
     #display the edit form with existing user instance information
-  else:
+    else:
         form = UserForm(instance=request.user)
         return render(request, 'edit_profile.html', {'form': form})
 
