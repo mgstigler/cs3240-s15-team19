@@ -626,9 +626,13 @@ def json_login(request):
 
     user = authenticate(username=username, password=password)
 
-    if user:
+    if user and user.is_active:
         resp = {
             'status': 'success',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+            }
         }
     else:
         resp = {

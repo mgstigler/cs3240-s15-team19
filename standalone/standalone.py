@@ -5,16 +5,18 @@ def run_program(http):
     # print(response.data.decode('utf-8'))
     # json_object = json.loads(response.data.decode('utf-8'))
     # print(json_object)
+    base_url = input("Please enter base url: ")
 
     while True:
-        if check_user_login(http):
+        json_user = check_user_login(http, base_url)
+        if json_user:
             break
         option = input("Invalid username/password. Try again? [Yn]")
         if option != 'Y':
             exit()
 
-def check_user_login(http):
-    login_url = 'http://127.0.0.1:8000/json_login/'
+def check_user_login(http, base_url):
+    login_url = base_url + '/json_login/'
     username = input("Username: ")
     password = getpass.getpass("Password: ")
     fields = {
@@ -25,7 +27,10 @@ def check_user_login(http):
 
     json_object = json.loads(response.data.decode('utf-8'))
 
-    return json_object['status'] == 'success'
+    if json_object['status'] == 'success':
+        return json_object['user']
+    else:
+        return None
 
 if __name__ == "__main__":
     http = urllib3.PoolManager()
