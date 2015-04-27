@@ -34,6 +34,22 @@ def copy(request, pk):
     fld.save()
     return HttpResponseRedirect(reverse('report-detail', args=(fld.id,)))
 
+def advanced_search(request):
+
+    if request.method == 'POST':
+        short = request.POST.get('short_description')
+        detailed = request.POST.get('detailed_description')
+        keyword = request.POST.get('keywords')
+
+        if short or detailed or keyword:
+            results = Report.objects.filter(short__icontains=short, detailed__icontains=detailed, keywords__icontains=keyword).order_by('time') 
+        else:
+            results = Report.objects.all()
+        return render(request, 'search_result.html', {'results':results})
+    else:
+        return render(request, 'advanced_search.html', {})
+
+
 class JointFolderReportView(View):
     def get(self, request, folder_id):
         # TODO FILTER BASED ON CURRENT USER
