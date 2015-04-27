@@ -84,7 +84,12 @@ urlpatterns = patterns('',
     url(r'user-manager/$', secure_witness.views.AdminUserManager.as_view(),
         name='user-manager'),
     url(r'user-manager/(?P<user_id>\d+)$', secure_witness.views.switch_user_active,
-        name='user-manager-activate')
+        name='user-manager-activate'),
+    url(r'edit-profile/$', secure_witness.views.edit_profile,
+        name='edit-profile'),
+    url(r'^download/(?P<pk>\d+)/$', secure_witness.views.downloadfiles,
+        name='download'),
+
 
 
 )

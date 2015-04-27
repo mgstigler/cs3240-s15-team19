@@ -109,7 +109,7 @@ TEMPLATE_DIRS = (
 )
 
 # Parse database configuration from $DATABASE_URL
-import dj_database_url
+#import dj_database_url
 
 # ------------------------------------------------------------
 # NOTE: Commenting this line makes the app work locally.

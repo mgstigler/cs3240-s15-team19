@@ -13,7 +13,7 @@
     <p>Time: {{ report.time }}</p>
     <p>Keywords: {{ report.keywords }}</p>
     <p>Privacy: {{ report.private }}</p>
-    Files:
+    Files (<a href="{% url 'download' pk=report.id %}">Download zip</a>):
     <ul>
     {% for file in file_list %}
         <li>{{ file.filename }}</li>
