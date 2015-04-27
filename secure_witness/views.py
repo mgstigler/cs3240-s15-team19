@@ -1,3 +1,6 @@
+import os
+import zipfile
+import io
 from django.views.generic import View, ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.shortcuts import render, render_to_response, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -33,6 +36,22 @@ def copy(request, pk):
     fld.id = None
     fld.save()
     return HttpResponseRedirect(reverse('report-detail', args=(fld.id,)))
+
+def advanced_search(request):
+
+    if request.method == 'POST':
+        short = request.POST.get('short_description')
+        detailed = request.POST.get('detailed_description')
+        keyword = request.POST.get('keywords')
+
+        if short or detailed or keyword:
+            results = Report.objects.filter(short__icontains=short, detailed__icontains=detailed, keywords__icontains=keyword).order_by('time') 
+        else:
+            results = Report.objects.all()
+        return render(request, 'search_result.html', {'results':results})
+    else:
+        return render(request, 'advanced_search.html', {})
+
 
 class JointFolderReportView(View):
     def get(self, request, folder_id):
@@ -410,6 +429,68 @@ def switch_user_active(request, user_id):
     user.save()
 
     return HttpResponseRedirect('/user-manager/')
+
+def edit_profile(request):
+
+    #Save the new info into the existing user instance
+    if request.method == "POST":
+        form = UserForm(data=request.POST, instance=request.user)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(user.password)
+            user.save()
+        #else:
+         #  return HttpResponse("Please enter information for each field.")
+
+        #Keep the user logged in
+        # User .get() method to return None if not present
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Check if password is valid
+        sameuser = authenticate(username=username, password=password)
+
+        # If user != None, then login worked
+        if sameuser:
+            if sameuser.is_active:
+                login(request, sameuser)
+                # Link to the post-login screen
+                return HttpResponseRedirect('/browse/')
+            else:
+                return HttpResponse("Account is disabled. Please contact the admin.")
+        else:
+            return HttpResponse("Invalid login information supplied")
+
+    #display the edit form with existing user instance information
+    else:
+        form = UserForm(instance=request.user)
+        return render(request, 'edit_profile.html', {'form': form})
+
+def downloadfiles(request, pk):
+    # Files (local path) to put in the .zip
+    # FIXME: Change this (get paths from DB etc)
+    filenames = []
+
+    
+    for querydict in Media.objects.filter(id=pk).values():
+        path = '/cs3240-s15-team19/group/media/'+querydict['filename']
+        if path != '':
+            filenames.append(path)
+
+    # The zip compressor
+    zf = zipfile.ZipFile('media.zip', "w")
+    for x in filenames:
+        zf.write(x)
+
+    # Must close zip for all contents to be written
+    zf.close()
+
+    # Grab ZIP file from in-memory
+    resp = HttpResponse(zf, content_type='application/zip')
+    # ..and correct content-disposition
+    resp['Content-Disposition'] = 'attachment; filename=%s' % "media.zip"
+
+    return resp
 
 def add_comment(request, report_id):
     if request.method == 'POST':

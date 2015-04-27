@@ -2,7 +2,6 @@ from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf import settings
 from django.contrib import admin
-
 import secure_witness.views
 from secure_witness.views import saved
 
@@ -91,11 +90,18 @@ urlpatterns = patterns('',
         name='user-manager'),
     url(r'user-manager/(?P<user_id>\d+)$', secure_witness.views.switch_user_active,
         name='user-manager-activate'),
+    url(r'edit-profile/$', secure_witness.views.edit_profile,
+        name='edit-profile'),
+    url(r'^download/(?P<pk>\d+)/$', secure_witness.views.downloadfiles,
+        name='download'),
 
     #/register/
     url(r'^register/$', secure_witness.views.register_user, name='register-user'),
     #/confirm/111
     url(r'confirm/(?P<activation_key>\w+)/$', secure_witness.views.register_confirm, name='register-confirm'),
+
+    #/advanced-search/
+    url(r'^advanced-search/$', secure_witness.views.advanced_search, name='advanced-search'),
 
 )
 

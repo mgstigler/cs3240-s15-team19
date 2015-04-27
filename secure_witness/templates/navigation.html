@@ -7,8 +7,9 @@
             <li>
                 <form class="navbar-form" method="GET" action="{% url 'search' %}">
                   <input class="form-control" type="text" placeholder="Search" name="q" />
-                  <input class="btn btn-default" type="submit" />
+                  <input class="btn btn-default" type="submit" value="Search"/>
                 </form>
+                <li><a href="{% url 'advanced-search' %}">Advanced Search</a></li>
             </li>
 
             <!-- Browse Dropdown -->
@@ -37,7 +38,7 @@
                     {{ user.username }} <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href="#">Profile</a></li>
+                    <li><a href="{% url 'edit-profile' %}">Profile</a></li>
                     <li><a href="{% url 'logout' %}">Logout</a></li>
                 </ul>
             </li>

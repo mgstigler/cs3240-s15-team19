@@ -29,7 +29,7 @@ class ReportForm(forms.ModelForm):
         fields = ['folder', 'short', 'detailed', 'location', 'today', 'keywords', 'time', 'private', 'authorized_groups']
 
 class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
+    password = forms.CharField(widget=forms.PasswordInput(), required=True)
 
     class Meta:
         model = User

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Edit user profile</h1>
+    <p>Please enter desired new password or existing password.</p>
+
+        <form id="user_form" method="post" action="{% url 'edit-profile' %}">
+            {% csrf_token %}
+
+            <!-- Display forms as <p> elements for formatting -->
+            {{ form.as_p }}
+
+            <input type="submit" name="Submit" value="Save changes" />
+        </form>
+</div>
+
+{% endblock %}
