@@ -19,7 +19,7 @@ import hashlib, datetime, random
 def search(request):
     query = request.GET.get('q')
     if query:
-        results = Report.objects.filter(keywords__icontains=query)
+        results = Report.objects.filter(Q(short__icontains=query) | Q(detailed__icontains=query) | Q(keywords__icontains=query)).order_by('time')
     else:
         results = Report.objects.all()
     return render(request, 'search_result.html', {'results':results})
