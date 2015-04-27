@@ -414,8 +414,8 @@ def edit_profile(request):
             user = form.save(commit=False)
             user.set_password(user.password)
             user.save()
-        else:
-            request.POST
+        #else:
+         #  return HttpResponse("Please enter information for each field.")
 
         #Keep the user logged in
         # User .get() method to return None if not present
@@ -433,6 +433,8 @@ def edit_profile(request):
                 return HttpResponseRedirect('/browse/')
             else:
                 return HttpResponse("Account is disabled. Please contact the admin.")
+        else:
+            return HttpResponse("Invalid login information supplied")
 
     #display the edit form with existing user instance information
     else:
