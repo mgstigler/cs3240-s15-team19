@@ -11,7 +11,6 @@ from secure_witness.models import (
     Report,
 )
 
-
 class ReportForm(forms.ModelForm):
 
     time = forms.DateField(widget=forms.DateInput(format='%d/%m/%Y'),
