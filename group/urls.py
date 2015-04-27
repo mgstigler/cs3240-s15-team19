@@ -36,6 +36,15 @@ urlpatterns = patterns('',
     #/rep/5/
     url(r'^rep/(?P<pk>\d+)/$', secure_witness.views.ReportView.as_view(),
         name='report-detail',),
+    #/rep/1/add-comment
+    url(r'^rep/(?P<report_id>\d+)/add-comment$', secure_witness.views.add_comment,
+        name='report-add-comment'),
+    #/rep/1/edit-comment
+    url(r'^rep/(?P<report_id>\d+)/edit-comment/(?P<pk>\d+)/$', secure_witness.views.CommentUpdateView.as_view(),
+        name='report-edit-comment'),
+    #/rep/1/delete-comment
+    url(r'rep/(?P<report_id>\d+)/delete-comment/(?P<pk>\d+)/$', secure_witness.views.CommentDeleteView.as_view(),
+        name='report-delete-comment'),
 
     #/deleterep/5/    
     url(r'^deleterep/(?P<pk>\d+)/$', secure_witness.views.DeleteReportView.as_view(),
@@ -43,12 +52,6 @@ urlpatterns = patterns('',
 
     url(r'^editrep/(?P<pk>\d+)/$', secure_witness.views.UpdateReportView.as_view(),
         name='report-edit',),
-    #/report/
-    #url(r'^report/', report, name='report-new'),
-    #/submit/
-    #url(r'^submit$', submit),
-    #/register/
-    url(r'^register/$', secure_witness.views.register, name='register'),
     #/login/
     url(r'^login/$', secure_witness.views.user_login, name='login'),
     #/logout/
@@ -90,7 +93,10 @@ urlpatterns = patterns('',
     url(r'^download/(?P<pk>\d+)/$', secure_witness.views.downloadfiles,
         name='download'),
 
-
+    #/register/
+    url(r'^register/$', secure_witness.views.register_user, name='register-user'),
+    #/confirm/111
+    url(r'confirm/(?P<activation_key>\w+)/$', secure_witness.views.register_confirm, name='register-confirm'),
 
 )
 

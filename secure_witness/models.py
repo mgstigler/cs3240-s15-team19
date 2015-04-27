@@ -21,6 +21,12 @@ class BaseModel(models.Model):
         self.updated_at = timezone.now()
         return super(BaseModel, self).save(*args, **kwargs)
 
+class Comment(BaseModel):
+    report = models.ForeignKey('Report')
+
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=200)
+
 class Folder(BaseModel):
 
     folder_name = models.CharField(
@@ -74,7 +80,8 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User)
 
     # Extra fields aside from default user fields
-    # TODO Add extra fields if needed
+    activation_key = models.CharField(max_length=40, blank=True)
+    key_expires = models.DateTimeField(default=timezone.now())
 
     def __str__(self):
         return self.user.username

@@ -3,19 +3,43 @@
 {% block content %}
 
 <div class="container">
-    <h1>Register for Secure Witness</h1>
-    {% if registered %}
-        Thank you for registering! <br />
-    {% else %}
-        <form id="user_form" method="post" action="{% url 'register' %}">
-            {% csrf_token %}
-
-            <!-- Display forms as <p> elements for formatting -->
-            {{ user_form.as_p }}
-
-            <input type="submit" name="Submit" value="Register" />
-        </form>
-    {% endif %}
+<form class="form-signup" action="{% url 'register-user' %}" method="post">{% csrf_token %}
+    <h2>Create your account</h2>
+    <div class="fieldWrapper">
+        <label>First name</label><br>
+        {{ form.first_name }}
+    </div>
+    <br>
+    <div class="fieldWrapper">
+        <label>Last name</label><br>
+        {{ form.last_name }}
+    </div>
+    <br>
+    <div class="fieldWrapper">
+        {{ form.email.errors }}
+        <label>Email</label><br>
+        {{ form.email }}
+    </div>
+    <br>
+    <div class="fieldWrapper">
+    {{form.errors.values.0}}
+        <label>Username</label><br>
+        {{ form.username }}
+    </div>
+    <br>
+    <div class="fieldWrapper">
+        {{form.errors.values.1}}
+        <label>Password</label><br>
+        {{ form.password1 }}
+    </div>
+    <br>
+    <div class="fieldWrapper">
+        <label>Password again</label><br>
+        {{ form.password2 }}
+    </div>
+    <br/>
+    <input type="submit" name="submit" class="btn btn-primary" value="Create account">
+</form>
 
 </div>
 

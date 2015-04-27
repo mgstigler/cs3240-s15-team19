@@ -2,23 +2,27 @@ import os
 import zipfile
 import io
 from django.views.generic import View, ListView, CreateView, UpdateView, DeleteView, DetailView
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group, User
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.core.mail import send_mail
+from django.core.context_processors import csrf
+from django.utils import timezone
+from django.template import RequestContext
 
+from secure_witness.models import *
+from secure_witness.forms import *
 
-from secure_witness.models import Folder, Media, Report
-from secure_witness.forms import UserForm, ReportForm
-
+import hashlib, datetime, random
 
 
 def search(request):
     query = request.GET.get('q')
     if query:
-        results = Report.objects.filter(keywords__icontains=query)
+        results = Report.objects.filter(Q(short__icontains=query) | Q(detailed__icontains=query) | Q(keywords__icontains=query)).order_by('time')
     else:
         results = Report.objects.all()
     return render(request, 'search_result.html', {'results':results})
@@ -142,6 +146,9 @@ class ReportView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ReportView, self).get_context_data(**kwargs)
         context['file_list'] =  Media.objects.filter(report__id=self.object.id)
+
+        # Get the list of comments associated with the report
+        context['comment_list'] = Comment.objects.filter(report__id=self.object.id).order_by('-created_at')
         return context
 
 class CreateFolderView(CreateView):
@@ -200,55 +207,6 @@ class FolderView(DetailView):
     fields = "__all__"
     template_name = 'folder.html'
 
-"""
-def report(request):
-    return render(request, 'enter_report.html', {})
-
-
-def submit(request):
-    s = request.POST.get('short_description')
-    d = request.POST.get('detailed_description')
-    l = request.POST.get('location')
-    k = request.POST.get('keywords')
-    i = request.POST.get('incident_date')
-    p = request.POST.get('privacy')
-
-    priv = False
-    if p == 'Private':
-        priv = True
-
-    rep = File(short=s, detailed=d, location=l, keywords=k, today=i, private=priv)
-    rep.save()
-
-    # Save each file associated with the Report
-    for file in request.FILES.getlist('media'):
-        if priv==True:
-            new_iv = Random.new().read(DES3.block_size)  # get_random_bytes(8)
-            new_key = Random.new().read(DES3.key_size[-1])  # get_random_bytes(16)
-            in_filename = str(file)
-            spot = in_filename.index(".")
-            out_filename = in_filename[0:spot] + ".enc"
-            encrypt_file(in_filename, out_filename, 8192, new_key, new_iv)
-            Media(filename=in_filename, is_encrypted=p, content=out_filename, report=rep, key=new_key, iv=new_iv).save()
-        else:
-           Media(filename=str(file), is_encrypted=p, content=file, report=rep, key=0, iv=0).save()
-
-    all = File.objects.all() #filter(short='short')
-    return HttpResponse(all)
-
-def encrypt_file(in_filename, out_filename, chunk_size, key, iv):
-    des3 = DES3.new(key, DES3.MODE_CFB, iv)
-    with open(in_filename, 'rb') as in_file:
-        with open(out_filename, 'wb') as out_file:
-            while True:
-                chunk = in_file.read(chunk_size)
-                if len(chunk) == 0:
-                    break
-                elif len(chunk) % 16 != 0:
-                    chunk += b"\0" * (16 - len(chunk) % 16)
-                out_file.write(des3.encrypt(chunk))
-"""
-
 def user_login(request):
     # Process data from POST
     if request.method == 'POST':
@@ -283,37 +241,62 @@ def user_logout(request):
 
     return HttpResponseRedirect('/login/')
 
-def register(request):
-    # Indicate status of registration
-    registered = False
-
-    # Process data from POST
+def register_user(request):
+    args = {}
+    args.update(csrf(request))
     if request.method == 'POST':
-        user_form = UserForm(data=request.POST)
+        form = RegistrationForm(request.POST)
+        args['form'] = form
 
-        if (user_form.is_valid()):
-            # Save the user_form to the database
-            user = user_form.save()
+        if form.is_valid():
+            form.save()
 
-            # Hash the password with set_password
-            user.set_password(user.password)
-            user.save()
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            random_string = str(random.random()).encode('utf8')
+            salt = hashlib.sha1(random_string).hexdigest()[:5]
+            salted = (salt + email).encode('utf8')
+            activation_key = hashlib.sha1(salted).hexdigest()
+            key_expires = timezone.now() + datetime.timedelta(2)
 
-            # Registration finished successfully
-            registered = True
+            # Get the user
+            user = User.objects.get(username=username)
 
-        else:
-            print(user_form.errors)
+            # Create new user profile
+            user_profile = UserProfile(user=user, activation_key=activation_key,
+                   key_expires=key_expires)
+            user_profile.save()
 
-    # GET request, create a blank form
+            # Send activation email
+            email_subject = 'Account Confirmation'
+            email_body = "To activate your account, please visit: \
+                /confirm/%s" % (activation_key)
+
+            send_mail(email_subject, email_body, 'sdgennari@gmail.com', [email], fail_silently=False)
+
+            return HttpResponseRedirect('login')
+
     else:
-        user_form = UserForm()
+        args['form'] = RegistrationForm()
 
-    # Return the appropriate request, created above
-    return render(request, 'register.html', {
-        'user_form': user_form,
-        'registered': registered,
-    })
+    return render_to_response('register.html', args, context_instance=RequestContext(request))
+
+def register_confirm(request, activation_key):
+    # If the user is already logged in, stop activation process
+    if request.user.is_authenticated():
+        HttpResponseRedirect('/browse')
+
+    # Check if a user with the activation_key exists
+    user_profile = get_object_or_404(UserProfile, activation_key=activation_key)
+
+    # Make sure the user has not expired
+    if user_profile.key_expires < timezone.now():
+        return HttpResponse("Activation key has expired. Please re-register")
+
+    user = user_profile.user
+    user.is_active = True
+    user.save()
+    return HttpResponse("Account confirmed")
 
 class GroupListView(ListView):
     context_object_name = "group_list"
@@ -483,3 +466,40 @@ def downloadfiles(request, pk):
     return resp
 
 
+def add_comment(request, report_id):
+    if request.method == 'POST':
+        # Get the information from the post
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+
+        # Get the associated report
+        report = Report.objects.get(id=report_id)
+
+        # Create and save a comment with the new info
+        comment = Comment(title=title, description=description, report=report)
+        comment.created_by = request.user
+        comment.updated_by = request.user
+        comment.save()
+
+        # Return to the report view
+        return HttpResponseRedirect(reverse('report-detail', args=(report_id)))
+
+class CommentUpdateView(UpdateView):
+    model = Comment
+    fields = "__all__"
+    template_name = "comment_edit.html"
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super(CommentUpdateView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('report-detail', args=(self.object.report.id,))
+
+class CommentDeleteView(DeleteView):
+    model = Comment
+    fields = "__all__"
+    template_name = "comment_confirm_delete.html"
+
+    def get_success_url(self):
+        return reverse('report-detail', args=(self.object.report.id,))

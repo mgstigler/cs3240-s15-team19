@@ -24,6 +24,51 @@
     <a href="{% url "copy" pk=report.id %}">Copy Report</a><br/>
     <a href="{% url 'browse' folder_id=report.folder.id %}">Back to List</a>
 
+    {% if report.id %}
+    <h4>Add a Comment</h4>
+    <form class="clearfix" id="add_comment_form" action="{% url 'report-add-comment' report_id=report.id %}" method="post">
+        {% csrf_token %}
+        <input class="form-control form-group" type="text" name="title" placeholder="Title" />
+        <textarea class="form-control form-group" rows="4" name="description" form="add_comment_form" placeholder="Description"></textarea>
+        <div class="form-group pull-right">
+            <input class="btn btn-primary" type="submit" value="Add Comment">
+        </div>
+    </form>
+
+    <ul class="media-list">
+    {% for comment in comment_list %}
+        <hr>
+        <li class="media">
+            <div class="media-left">
+                <span class="glyphicon glyphicon-comment" style="font-size: 2em"></span>
+            </div>
+            <div class="media-body">
+                <h4 class="media-heading">{{ comment.title }}</h4>
+                <span class="media-body">{{ comment.description }}</span>
+                <div class="row">
+                    <span class="col-md-2 text-right pull-right">{{ comment.updated_at|date:"n/j/y G:i" }}</span>
+                    <span class="col-md-1 text-right pull-right">{{ comment.updated_by.username }}</span>
+                    {% if comment.created_by == user %}
+                    <form class="col-md-1 text-center pull-right" style="display: inline"
+                          action="{% url 'report-delete-comment' report_id=comment.report.id pk=comment.id %}">
+                        <button class="btn btn-danger" type="submit">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </button>
+                    </form>
+                    <form class="col-md-1 text-center pull-right" style="display: inline"
+                          action="{% url 'report-edit-comment' report_id=comment.report.id pk=comment.id %}">
+                        <button class="btn btn-primary" type="submit">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+
 </div>
 
 {% endblock %}
