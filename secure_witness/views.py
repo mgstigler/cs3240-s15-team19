@@ -109,7 +109,8 @@ class UpdateReportView(UpdateView):
     def get_success_url(self):
         # Save each file associated with the report
         for file in self.request.FILES.getlist('files'):
-            m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object)
+            m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object, \
+                created_by=self.request.user, updated_by=self.request.user)
             m.save()
 
         # Get the folder id from the object for the reverse url
@@ -439,3 +440,11 @@ class CommentDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse('report-detail', args=(self.object.report.id,))
+
+def media_delete(request, report_id, media_id):
+    media_id = int(media_id)
+
+    m = Media.objects.get(id=media_id)
+    m.delete()
+
+    return HttpResponseRedirect(reverse('report-edit', args=(report_id,)))
