@@ -641,6 +641,31 @@ def json_login(request):
 
     return JsonResponse(resp)
 
+def json_report_list(request, user_id):
+    print("Called")
+    # Get the corresponding user
+    user = User.objects.get(id=user_id)
+
+    # Get the associated reports
+    user_group_list = user.groups.all()
+    query = Q(private=False) | Q(created_by=user)
+    for g in user_group_list:
+        query |= Q(authorized_groups=g)
+    report_list = Report.objects.filter(query).distinct().order_by('short')
+
+    report_resp_list = []
+    for report in report_list:
+        rep_resp = {
+            'id': report.id,
+            'short': report.short,
+        }
+        report_resp_list.append(rep_resp)
+
+    response = {'report_list': report_resp_list}
+
+    return JsonResponse(response)
+
+
 def json_test(request):
     report = Report.objects.get(id=1)
     media_list = Media.objects.filter(report__id=1)
