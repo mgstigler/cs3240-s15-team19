@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h3>Search specific fields</h3>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+         <input class="form-control" type="text" name="short_description" value="" placeholder="Short Description" size="50" aria-describedby="basic-addon1"/><br />
+         <input class="form-control" type="text" name="detailed_description" value="" placeholder="Detailed Description" size="50" aria-describedby="basic-addon1"/><br />
+        <input class="form-control" type="text" name="keywords" value="" placeholder="Keywords" size="50" aria-describedby="basic-addon1"/><br />
+       
+        <input class="btn btn-primary col-md-12" type="submit" value="Search" />
+    </form>
+
+</div>
+
+{% endblock %}
