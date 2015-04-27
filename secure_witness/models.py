@@ -81,7 +81,7 @@ class UserProfile(models.Model):
 
     # Extra fields aside from default user fields
     activation_key = models.CharField(max_length=40, blank=True)
-    key_expires = models.DateTimeField(default=timezone.now())
+    key_expires = models.DateTimeField(blank=True)
 
     def __str__(self):
         return self.user.username
