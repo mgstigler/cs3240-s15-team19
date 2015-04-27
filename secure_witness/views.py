@@ -18,6 +18,9 @@ from secure_witness.forms import *
 
 import hashlib, datetime, random
 
+from Crypto.Cipher import DES3
+import random
+import mimetypes
 
 def search(request):
     query = request.GET.get('q')
@@ -106,10 +109,35 @@ class CreateReportView(CreateView):
 
     def get_success_url(self):
         # Save each file associated with the report
+         # Save each file associated with the report
         for file in self.request.FILES.getlist('files'):
-            m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object,
-                      created_by=self.request.user, updated_by=self.request.user)
-            m.save()
+            mimetypes.init()
+            mime_type = mimetypes.guess_type(str(file))
+            file_type = mime_type[0]
+            if self.object.private:
+                new_iv = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(8))
+                new_key = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for j in range(16))
+                des3 = DES3.new(new_key, DES3.MODE_CFB, new_iv)
+                enc_filename = str(file) + ".enc"
+                with open("media/" + enc_filename, 'wb') as enc_file:
+                    for chunk in file.chunks(8192):
+                        if len(chunk) == 0:
+                            break
+                        elif len(chunk) % 16 != 0:
+                            chunk += (' ' * (16 - len(chunk) % 16)).encode()
+                            enc_file.write(des3.encrypt(chunk))
+                        else:
+                            enc_file.write(des3.encrypt(chunk))
+                        enc_file.seek(0)
+                m = Media(filename=str(enc_filename), is_encrypted=self.object.private, content=enc_filename,
+                          report=self.object, key=new_key, iv=new_iv, fileType=file_type,
+                          created_by=self.request.user, updated_by=self.request.user)
+                m.save()
+            else:
+                m = Media(filename=str(file), is_encrypted=self.object.private, content=file,
+                          report=self.object, fileType=file_type,
+                          created_by=self.request.user, updated_by=self.request.user)
+                m.save()
 
         # Every report can be seen by admins
         admin_group = Group.objects.get(name="admins")
@@ -140,10 +168,35 @@ class UpdateReportView(UpdateView):
 
     def get_success_url(self):
         # Save each file associated with the report
+         # Save each file associated with the report
         for file in self.request.FILES.getlist('files'):
-            m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object, \
-                created_by=self.request.user, updated_by=self.request.user)
-            m.save()
+            mimetypes.init()
+            mime_type = mimetypes.guess_type(str(file))
+            file_type = mime_type[0]
+            if self.object.private:
+                new_iv = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(8))
+                new_key = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for j in range(16))
+                des3 = DES3.new(new_key, DES3.MODE_CFB, new_iv)
+                enc_filename = str(file) + ".enc"
+                with open("media/" + enc_filename, 'wb') as enc_file:
+                    for chunk in file.chunks(8192):
+                        if len(chunk) == 0:
+                            break
+                        elif len(chunk) % 16 != 0:
+                            chunk += (' ' * (16 - len(chunk) % 16)).encode()
+                            enc_file.write(des3.encrypt(chunk))
+                        else:
+                            enc_file.write(des3.encrypt(chunk))
+                        enc_file.seek(0)
+                m = Media(filename=str(enc_filename), is_encrypted=self.object.private, content=enc_filename,
+                          report=self.object, key=new_key, iv=new_iv, fileType=file_type,
+                          created_by=self.request.user, updated_by=self.request.user)
+                m.save()
+            else:
+                m = Media(filename=str(file), is_encrypted=self.object.private, content=file,
+                          report=self.object, fileType=file_type,
+                          created_by=self.request.user, updated_by=self.request.user)
+                m.save()
 
         # Every report can be seen by admins
         admin_group = Group.objects.get(name="admins")
