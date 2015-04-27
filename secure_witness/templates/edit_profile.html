@@ -4,6 +4,7 @@
 
 <div class="container">
     <h1>Edit user profile</h1>
+    <p>Please enter desired new password or existing password.</p>
 
         <form id="user_form" method="post" action="{% url 'edit-profile' %}">
             {% csrf_token %}

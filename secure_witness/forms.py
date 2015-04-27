@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import UserCreationForm
+from django.db.models import Q
 from secure_witness.models import UserProfile, Report
 from django.forms.models import inlineformset_factory
 
@@ -9,7 +10,6 @@ from secure_witness.models import (
     Folder,
     Report,
 )
-
 
 class ReportForm(forms.ModelForm):
 
@@ -20,7 +20,8 @@ class ReportForm(forms.ModelForm):
     today = forms.CharField(required=False)
     keywords = forms.CharField(required=False)
     folder = forms.ModelChoiceField(queryset=Folder.objects.all(), required=False)
-    authorized_groups = forms.ModelMultipleChoiceField(queryset=Group.objects.all(),
+    # Display all groups except admin group
+    authorized_groups = forms.ModelMultipleChoiceField(queryset=Group.objects.filter(~Q(name='admins')),
         required=False, widget=forms.CheckboxSelectMultiple)
 
     class Meta:
@@ -28,7 +29,7 @@ class ReportForm(forms.ModelForm):
         fields = ['folder', 'short', 'detailed', 'location', 'today', 'keywords', 'time', 'private', 'authorized_groups']
 
 class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
+    password = forms.CharField(widget=forms.PasswordInput(), required=True)
 
     class Meta:
         model = User

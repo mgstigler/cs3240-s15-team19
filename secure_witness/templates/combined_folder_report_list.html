@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load app_filters %}
 {% block content %}
 <div class="container">
 
@@ -22,12 +22,12 @@
                     <div class="row">
                         <span class="col-md-4 text-center">{{ folder.updated_at|date:"n/j/y G:i" }}</span>
                         <span class="col-md-4 text-center">{{ folder.updated_by.username }}</span>
+                        {% if user|has_group:"admins" or folder.created_by == user %}
                         <form class="col-md-2 text-center" style="display: inline" action="{% url 'folders-edit' pk=folder.id %}">
                             <button class="btn btn-primary" type="submit">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </button>
                         </form>
-                        {% if is_admin %}
                         <form class="col-md-2 text-center" style="display: inline" action="{% url 'folders-delete' pk=folder.id %}">
                             <button class="btn btn-danger" type="submit">
                                 <span class="glyphicon glyphicon-trash"></span>
@@ -47,12 +47,12 @@
                     <div class="row">
                         <span class="col-md-4 text-center">{{ report.updated_at|date:"n/j/y G:i" }}</span>
                         <span class="col-md-4 text-center">{{ report.updated_by.username }}</span>
+                        {% if user|has_group:"admins" or report.created_by == user %}
                         <form class="col-md-2 text-center" style="display: inline" action="{% url 'report-edit' pk=report.id %}">
                             <button class="btn btn-primary" type="submit">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </button>
                         </form>
-                        {% if is_admin %}
                         <form class="col-md-2 text-center" style="display: inline" action="{% url 'reports-delete' pk=report.id %}">
                             <button class="btn btn-danger" type="submit">
                                 <span class="glyphicon glyphicon-trash"></span>

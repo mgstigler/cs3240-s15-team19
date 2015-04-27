@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load app_filters %}
 {% block content %}
 
 <div class="container">
@@ -20,8 +20,10 @@
     {% endfor %}
     </ul>
 
+    {% if user|has_group:"admins" or report.created_by == user %}
     <a href="{% url "report-edit" pk=report.id %}">Edit Report</a><br/>
     <a href="{% url "copy" pk=report.id %}">Copy Report</a><br/>
+    {% endif %}
     <a href="{% url 'browse' folder_id=report.folder.id %}">Back to List</a>
 
     {% if report.id %}

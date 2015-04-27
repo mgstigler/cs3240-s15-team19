@@ -17,11 +17,20 @@
         {% csrf_token %}
         {{ form.as_p }}
         <input multiple type="file" name="files" id="file-input"/><br/>
-        <ul id="file-list">
+
+        <!-- New files added -->
+        <ul id="new-file-list"></ul>
+        {% if report.id %}
+        <!-- Old files already associated with the report -->
+        <ul id="old-file-list">
             {% for file in file_list %}
-                <li>{{ file.filename }}</li>
+                <li>
+                    {{ file.filename }}
+                    <a href="{% url 'media-delete' report_id=file.report.id media_id=file.id %}">Delete</a>
+                </li>
             {% endfor %}
         </ul>
+        {% endif %}
         <input id="save_report" type="submit" value="Save" />
     </form>
 
@@ -29,7 +38,7 @@
     <script type="text/javascript">
         $(function() {
             $("input:file").change(function() {
-                var fileListUl = $("#file-list");
+                var fileListUl = $("#new-file-list");
                 fileListUl.empty();
                 for(var i = 0; i < this.files.length; i++) {
                     $("<li>" + this.files[i].name + "</li>").appendTo(fileListUl);
