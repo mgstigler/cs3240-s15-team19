@@ -21,10 +21,14 @@ import hashlib, datetime, random
 
 def search(request):
     query = request.GET.get('q')
+    q = Q(private=False) | Q(created_by=request.user)
+    user_group_list = request.user.groups.all()
+    for g in user_group_list:
+        q |= Q(authorized_groups=g)
     if query:
-        results = Report.objects.filter(Q(short__icontains=query) | Q(detailed__icontains=query) | Q(keywords__icontains=query)).order_by('time')
+        results = Report.objects.filter(q, Q(short__icontains=query) | Q(detailed__icontains=query) | Q(keywords__icontains=query)).order_by('time')
     else:
-        results = Report.objects.all()
+        results = Report.objects.filter(q)
     return render(request, 'search_result.html', {'results':results})
 
 def saved(request):
@@ -43,11 +47,16 @@ def advanced_search(request):
         short = request.POST.get('short_description')
         detailed = request.POST.get('detailed_description')
         keyword = request.POST.get('keywords')
+        user_group_list = request.user.groups.all()
+        query = Q(private=False) | Q(created_by=request.user)
+        for g in user_group_list:
+            query |= Q(authorized_groups=g)
 
         if short or detailed or keyword:
-            results = Report.objects.filter(short__icontains=short, detailed__icontains=detailed, keywords__icontains=keyword).order_by('time') 
+        
+            results = Report.objects.filter(query, short__icontains=short, detailed__icontains=detailed, keywords__icontains=keyword).order_by('time') 
         else:
-            results = Report.objects.all()
+            results = Report.objects.filter(query)
         return render(request, 'search_result.html', {'results':results})
     else:
         return render(request, 'advanced_search.html', {})
@@ -460,26 +469,28 @@ def downloadfiles(request, pk):
     # FIXME: Change this (get paths from DB etc)
     filenames = []
 
-    
-    for querydict in Media.objects.filter(id=pk).values():
-        path = '/cs3240-s15-team19/group/media/'+querydict[filename]
-        if path != '':
-            filenames.append(path)
+    if Media.objects.filter(id=pk):
+        for querydict in Media.objects.filter(id=pk).values():
+            path = '/cs3240-s15-team19/group/media/'+querydict[filename]
+            if path != '':
+                filenames.append(path)
 
     # The zip compressor
-    zf = zipfile.ZipFile('media.zip', "w")
-    for x in filenames:
-        zf.write(x)
+        zf = zipfile.ZipFile('media.zip', "w")
+        for x in filenames:
+            zf.write(x)
 
     # Must close zip for all contents to be written
-    zf.close()
+        zf.close()
 
     # Grab ZIP file from in-memory
-    resp = HttpResponse(zf, content_type='application/zip')
+        resp = HttpResponse(zf, content_type='application/zip')
     # ..and correct content-disposition
-    resp['Content-Disposition'] = 'attachment; filename=%s' % "media.zip"
+        resp['Content-Disposition'] = 'attachment; filename=%s' % "media.zip"
 
-    return resp
+        return resp
+    else:
+        return HttpResponseRedirect(reverse('report-detail', args=(pk)))
 
 
 def add_comment(request, report_id):
