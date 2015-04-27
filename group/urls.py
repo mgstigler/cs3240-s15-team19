@@ -103,6 +103,8 @@ urlpatterns = patterns('',
     #/advanced-search/
     url(r'^advanced-search/$', secure_witness.views.advanced_search, name='advanced-search'),
 
+    url(r'json_test/$', secure_witness.views.json_test, name='json-test'),
+
 )
 
 urlpatterns += staticfiles_urlpatterns()
