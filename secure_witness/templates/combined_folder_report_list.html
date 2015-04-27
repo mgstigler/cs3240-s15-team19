@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load app_filters %}
 {% block content %}
 <div class="container">
 
@@ -27,7 +27,7 @@
                                 <span class="glyphicon glyphicon-edit"></span>
                             </button>
                         </form>
-                        {% if is_admin %}
+                        {% if user|has_group:"admins" %}
                         <form class="col-md-2 text-center" style="display: inline" action="{% url 'folders-delete' pk=folder.id %}">
                             <button class="btn btn-danger" type="submit">
                                 <span class="glyphicon glyphicon-trash"></span>
@@ -52,7 +52,7 @@
                                 <span class="glyphicon glyphicon-edit"></span>
                             </button>
                         </form>
-                        {% if is_admin %}
+                        {% if user|has_group:'admins' %}
                         <form class="col-md-2 text-center" style="display: inline" action="{% url 'reports-delete' pk=report.id %}">
                             <button class="btn btn-danger" type="submit">
                                 <span class="glyphicon glyphicon-trash"></span>

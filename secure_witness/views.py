@@ -36,7 +36,6 @@ def copy(request, pk):
 
 class JointFolderReportView(View):
     def get(self, request, folder_id):
-        # TODO FILTER BASED ON CURRENT USER
         if folder_id:
             # Load reports in a specific folder
             folder_list = []
@@ -51,18 +50,18 @@ class JointFolderReportView(View):
             # Load all folders and reports
             folder_list = Folder.objects.all().order_by('folder_name')
             # Only retrieve public reports or ones that the user owns
+            user_group_list = request.user.groups.all()
             query = Q(private=False) | Q(created_by=self.request.user)
+            for g in user_group_list:
+                query |= Q(authorized_groups=g)
             report_list = Report.objects.filter(Q(folder__id=None), query).order_by('short')
             cur_folder_name = None
-
-        is_admin = request.user.groups.filter(name='admins').exists()
 
         # Render the page with the appropriate data
         return render(request, 'combined_folder_report_list.html', {
             'folder_list': folder_list,
             'report_list': report_list,
             'cur_folder_name': cur_folder_name,
-            'is_admin': is_admin
         })
 
 class CreateReportView(CreateView):
@@ -74,6 +73,7 @@ class CreateReportView(CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         form.instance.updated_by = self.request.user
+
         return super(CreateReportView, self).form_valid(form)
 
     def get_success_url(self):
@@ -82,6 +82,10 @@ class CreateReportView(CreateView):
             m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object,
                       created_by=self.request.user, updated_by=self.request.user)
             m.save()
+
+        # Every report can be seen by admins
+        admin_group = Group.objects.get(name="admins")
+        self.object.authorized_groups.add(admin_group)
 
         # Get the folder id from the object for the reverse url
         if self.object.folder:
@@ -113,11 +117,16 @@ class UpdateReportView(UpdateView):
                 created_by=self.request.user, updated_by=self.request.user)
             m.save()
 
+        # Every report can be seen by admins
+        admin_group = Group.objects.get(name="admins")
+        self.object.authorized_groups.add(admin_group)
+
         # Get the folder id from the object for the reverse url
         if self.object.folder:
             return reverse('browse', args=(self.object.folder.id,))
         else:
             return reverse('browse')
+
     def get_context_data(self, **kwargs):
         context = super(UpdateReportView, self).get_context_data(**kwargs)
         context['action'] = reverse('report-edit', kwargs={'pk': self.get_object().id})
@@ -130,9 +139,8 @@ class DeleteReportView(DeleteView):
     template_name = 'delete_report.html'
 
     def get_success_url(self):
-        fid = self.object.folder.id
-        if fid:
-            return reverse('browse', args=(fid,))
+        if self.object.folder:
+            return reverse('browse', args=(self.object.folder.id,))
         else:
             return reverse('browse')
 
