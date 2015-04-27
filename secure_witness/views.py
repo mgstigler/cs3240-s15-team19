@@ -24,6 +24,7 @@ import mimetypes
 
 from django.http import JsonResponse
 import json
+from django.views.decorators.csrf import csrf_exempt
 
 def search(request):
     query = request.GET.get('q')
@@ -299,7 +300,9 @@ class FolderView(DetailView):
 
 def user_login(request):
     # Process data from POST
+    print('Request received')
     if request.method == 'POST':
+        print("post-received")
         # User .get() method to return None if not present
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -616,6 +619,24 @@ def media_delete(request, report_id, media_id):
 # =================================================================
 # JSON views/methods for standalone app
 # =================================================================
+@csrf_exempt
+def json_login(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+
+    user = authenticate(username=username, password=password)
+
+    if user:
+        resp = {
+            'status': 'success',
+        }
+    else:
+        resp = {
+            'status': 'failure',
+        }
+
+    return JsonResponse(resp)
+
 def json_test(request):
     report = Report.objects.get(id=1)
     media_list = Media.objects.filter(report__id=1)

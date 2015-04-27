@@ -6,7 +6,7 @@ class LoginRequiredMiddleware(object):
 
     def process_request(self, request):
         if request.path not in settings.LOGIN_EXEMPT_URLS and not request.path.startswith('/confirm') \
-                and request.user.is_anonymous():
+                and not request.path.startswith('/json_') and request.user.is_anonymous():
             if request.POST:
                 return login(request)
             else:
