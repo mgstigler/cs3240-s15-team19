@@ -7,10 +7,9 @@
     <h1>{{ report }}</h1>
 
     <p>{{ report.short }}</p>
-    <p>Time: {{ report.today }}</p>
     <p>Detailed Description: {{ report.detailed }}</p>
     <p>Location: {{ report.location }}</p>
-    <p>Time: {{ report.time }}</p>
+    <p>Date: {{ report.time }}</p>
     <p>Keywords: {{ report.keywords }}</p>
     <p>Privacy: {{ report.private }}</p>
     Files (<a href="{% url 'download' pk=report.id %}">Download zip</a>):

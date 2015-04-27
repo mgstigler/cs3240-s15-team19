@@ -47,11 +47,10 @@ class Keyword(models.Model):
 
 class Report(BaseModel):
     folder = models.ForeignKey(Folder, null=True)
-    time = models.DateField(max_length=50, null=True)
+    time = models.CharField(max_length=50, null=True)
     short = models.CharField(max_length=200, default='', null=True)
     detailed = models.CharField(max_length=1000, default='', null=True)
     location = models.CharField(max_length=50, default='', null=True)
-    today = models.CharField(max_length=1000, default='', null=True)
     keywords = models.CharField(max_length=1000, default='', null=True)
     #KWset = models.ManyToManyField(Keyword)
     private = models.BooleanField(default=False)

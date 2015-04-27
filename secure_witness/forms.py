@@ -13,12 +13,12 @@ from secure_witness.models import (
 
 class ReportForm(forms.ModelForm):
 
-    time = forms.DateField(widget=forms.DateInput(format='%d/%m/%Y'),
+    date = forms.DateField(widget=forms.DateInput(format='%d/%m/%Y'),
         input_formats=('%d/%m/%Y'),
         required=False)
     location = forms.CharField(required=False)
-    today = forms.CharField(required=False)
     keywords = forms.CharField(required=False)
+    time = forms.CharField(required=False)
     folder = forms.ModelChoiceField(queryset=Folder.objects.all(), required=False)
     # Display all groups except admin group
     authorized_groups = forms.ModelMultipleChoiceField(queryset=Group.objects.filter(~Q(name='admins')),
@@ -26,7 +26,7 @@ class ReportForm(forms.ModelForm):
 
     class Meta:
         model = Report
-        fields = ['folder', 'short', 'detailed', 'location', 'today', 'keywords', 'time', 'private', 'authorized_groups']
+        fields = ['folder', 'short', 'detailed', 'location', 'keywords', 'time', 'private', 'authorized_groups']
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(), required=True)
