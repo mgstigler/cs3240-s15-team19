@@ -15,6 +15,7 @@
         static3==0.5.1
         virtualenv==12.0.6
         whitenoise==1.0.6
+        pycrypto==2.6.1
         
 2. pip install -r requirements.txt
 
