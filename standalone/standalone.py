@@ -6,8 +6,8 @@ def run_program(http):
     # print(response.data.decode('utf-8'))
     # json_object = json.loads(response.data.decode('utf-8'))
     # print(json_object)
-    #base_url = input("Please enter base url: ")
-    base_url = 'http://127.0.0.1:8000'
+    base_url = input("Please enter base url: ")
+    #base_url = 'http://127.0.0.1:8000'
     json_user = None
     # Loop for user login
     while True:
@@ -125,7 +125,7 @@ def get_report_list(base_url, user_id):
 def check_user_login(http, base_url):
     login_url = base_url + '/json_login/'
     username = input(">>> Username: ")
-    password = getpass.getpass("Password: ")
+    password = getpass.getpass(">>> Password: ")
     fields = {
         'username': username,
         'password': password,
