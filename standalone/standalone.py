@@ -48,6 +48,21 @@ def run_program(http):
 
             if not report_found:
                 print("Report not found")
+        # download encrypted file
+        elif command.startswith('download'):
+            command_split = command.split()
+            media_name = command_split[1]
+            response = download_file(base_url, media_name)
+
+            with open(media_name, 'wb') as out_file:
+                out_file.write(response.data)
+
+            response.release_conn()
+
+def download_file(base_url, media_name):
+    url = base_url + '/json_file_download/' + media_name + '/'
+    response = http.request('GET', url)
+    return response
 
 def show_report_details(json_report):
     # Print all fields that are not lists

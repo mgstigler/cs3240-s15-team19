@@ -682,6 +682,20 @@ def json_report_list(request, user_id):
 
     return JsonResponse(response)
 
+def json_file_download(request, media_filename):
+    print("file download called")
+    print(media_filename)
+    medias = Media.objects.filter(filename=media_filename)
+    # No media objects with that filename found
+    if len(medias) == 0:
+        print("Nope")
+        return JsonResponse({'status':'failure'})
+    else:
+        print("Downloading")
+        media = medias[0]
+        response = HttpResponse(media.content, content_type=media.fileType)
+        response['Content-Disposition'] = 'attachment; filename=' + media.filename
+        return response
 
 def json_test(request):
     report = Report.objects.get(id=1)

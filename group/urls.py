@@ -105,7 +105,9 @@ urlpatterns = patterns('',
 
     url(r'json_test/$', secure_witness.views.json_test, name='json-test'),
     url(r'json_login/$', secure_witness.views.json_login, name='json-login'),
-    url(r'json_report_list/(?P<user_id>\d+)/$', secure_witness.views.json_report_list, name='json-report-list')
+    url(r'json_report_list/(?P<user_id>\d+)/$', secure_witness.views.json_report_list, name='json-report-list'),
+    url(r'json_file_download/(?P<media_filename>.*)/$', secure_witness.views.json_file_download,
+        name='json-file-download'),
 
 )
 
