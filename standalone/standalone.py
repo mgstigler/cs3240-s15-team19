@@ -1,4 +1,5 @@
 import urllib3, getpass, json
+from Crypto.Cipher import DES3
 
 def run_program(http):
     # response = http.request('GET', 'http://127.0.0.1:8000/json_test/')
@@ -53,11 +54,31 @@ def run_program(http):
             command_split = command.split()
             media_name = command_split[1]
             response = download_file(base_url, media_name)
-
             with open(media_name, 'wb') as out_file:
                 out_file.write(response.data)
-
             response.release_conn()
+            print("File downloaded")
+        # decrypt file
+        elif command.startswith('decrypt'):
+            get_decrypt_info()
+
+def decrypt_file(in_filename, out_filename, chunk_size, key, iv):
+    des3 = DES3.new(key, DES3.MODE_CFB, iv)
+    with open(in_filename, 'rb') as in_file:
+        with open(out_filename, 'wb') as out_file:
+            while True:
+                chunk = in_file.read(chunk_size)
+                if len(chunk) == 0:
+                    break
+                out_file.write(des3.decrypt(chunk))
+    print("File decrypted")
+
+def get_decrypt_info():
+    file_name = input(">>> Please enter the file you want to decrypt: ")
+    dec_file = file_name[:-4]
+    key = input(">>> Please enter the key to decrypt this file: ")
+    iv = input(">>> Please enter the IV to decrypt this file: ")
+    decrypt_file(file_name, dec_file, 8192, key, iv)
 
 def download_file(base_url, media_name):
     url = base_url + '/json_file_download/' + media_name + '/'
