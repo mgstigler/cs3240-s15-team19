@@ -12,10 +12,10 @@
     <p>Date: {{ report.time }}</p>
     <p>Keywords: {{ report.keywords }}</p>
     <p>Privacy: {{ report.private }}</p>
-    Files (<a href="{% url 'download' pk=report.id %}">Download zip</a>):
+    Files
     <ul>
     {% for file in file_list %}
-        <li>{{ file.filename }}</li>
+        <li><a href="{% url 'json-file-download' user_id=user.id media_filename=file.filename %}">{{ file.filename }}</a></li>
     {% endfor %}
     </ul>
 
