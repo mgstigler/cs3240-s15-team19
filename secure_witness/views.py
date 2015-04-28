@@ -18,6 +18,13 @@ from secure_witness.forms import *
 
 import hashlib, datetime, random
 
+from Crypto.Cipher import DES3
+import random
+import mimetypes
+
+from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 def search(request):
     query = request.GET.get('q')
@@ -106,10 +113,35 @@ class CreateReportView(CreateView):
 
     def get_success_url(self):
         # Save each file associated with the report
+         # Save each file associated with the report
         for file in self.request.FILES.getlist('files'):
-            m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object,
-                      created_by=self.request.user, updated_by=self.request.user)
-            m.save()
+            mimetypes.init()
+            mime_type = mimetypes.guess_type(str(file))
+            file_type = mime_type[0]
+            if self.object.private:
+                new_iv = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(8))
+                new_key = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for j in range(16))
+                des3 = DES3.new(new_key, DES3.MODE_CFB, new_iv)
+                enc_filename = str(file) + ".enc"
+                with open("media/" + enc_filename, 'wb') as enc_file:
+                    for chunk in file.chunks(8192):
+                        if len(chunk) == 0:
+                            break
+                        elif len(chunk) % 16 != 0:
+                            chunk += (' ' * (16 - len(chunk) % 16)).encode()
+                            enc_file.write(des3.encrypt(chunk))
+                        else:
+                            enc_file.write(des3.encrypt(chunk))
+                        enc_file.seek(0)
+                m = Media(filename=str(enc_filename), is_encrypted=self.object.private, content=enc_filename,
+                          report=self.object, key=new_key, iv=new_iv, fileType=file_type,
+                          created_by=self.request.user, updated_by=self.request.user)
+                m.save()
+            else:
+                m = Media(filename=str(file), is_encrypted=self.object.private, content=file,
+                          report=self.object, fileType=file_type,
+                          created_by=self.request.user, updated_by=self.request.user)
+                m.save()
 
         # Every report can be seen by admins
         admin_group = Group.objects.get(name="admins")
@@ -140,10 +172,35 @@ class UpdateReportView(UpdateView):
 
     def get_success_url(self):
         # Save each file associated with the report
+         # Save each file associated with the report
         for file in self.request.FILES.getlist('files'):
-            m = Media(filename=str(file), is_encrypted=self.object.private, content=file, report=self.object, \
-                created_by=self.request.user, updated_by=self.request.user)
-            m.save()
+            mimetypes.init()
+            mime_type = mimetypes.guess_type(str(file))
+            file_type = mime_type[0]
+            if self.object.private:
+                new_iv = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(8))
+                new_key = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for j in range(16))
+                des3 = DES3.new(new_key, DES3.MODE_CFB, new_iv)
+                enc_filename = str(file) + ".enc"
+                with open("media/" + enc_filename, 'wb') as enc_file:
+                    for chunk in file.chunks(8192):
+                        if len(chunk) == 0:
+                            break
+                        elif len(chunk) % 16 != 0:
+                            chunk += (' ' * (16 - len(chunk) % 16)).encode()
+                            enc_file.write(des3.encrypt(chunk))
+                        else:
+                            enc_file.write(des3.encrypt(chunk))
+                        enc_file.seek(0)
+                m = Media(filename=str(enc_filename), is_encrypted=self.object.private, content=enc_filename,
+                          report=self.object, key=new_key, iv=new_iv, fileType=file_type,
+                          created_by=self.request.user, updated_by=self.request.user)
+                m.save()
+            else:
+                m = Media(filename=str(file), is_encrypted=self.object.private, content=file,
+                          report=self.object, fileType=file_type,
+                          created_by=self.request.user, updated_by=self.request.user)
+                m.save()
 
         # Every report can be seen by admins
         admin_group = Group.objects.get(name="admins")
@@ -243,7 +300,9 @@ class FolderView(DetailView):
 
 def user_login(request):
     # Process data from POST
+    print('Request received')
     if request.method == 'POST':
+        print("post-received")
         # User .get() method to return None if not present
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -556,3 +615,90 @@ def media_delete(request, report_id, media_id):
     m.delete()
 
     return HttpResponseRedirect(reverse('report-edit', args=(report_id,)))
+
+# =================================================================
+# JSON views/methods for standalone app
+# =================================================================
+@csrf_exempt
+def json_login(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+
+    user = authenticate(username=username, password=password)
+
+    if user and user.is_active:
+        resp = {
+            'status': 'success',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+            }
+        }
+    else:
+        resp = {
+            'status': 'failure',
+        }
+
+    return JsonResponse(resp)
+
+def json_report_list(request, user_id):
+    # Get the corresponding user
+    user = User.objects.get(id=user_id)
+
+    # Get the associated reports
+    user_group_list = user.groups.all()
+    query = Q(private=False) | Q(created_by=user)
+    for g in user_group_list:
+        query |= Q(authorized_groups=g)
+    report_list = Report.objects.filter(query).distinct().order_by('short')
+
+    report_resp_list = []
+    for report in report_list:
+        # Get all the files for a report
+        media_list = Media.objects.filter(report__id=report.id)
+        file_resp = {}
+        for i in range(len(media_list)):
+            file_str = "file" + str(i)
+            file_resp[file_str] = media_list[i].filename
+
+        # Create response for each report
+        rep_resp = {
+            'id': report.id,
+            'short': report.short,
+            'detailed': report.detailed,
+            'time': report.time,
+            'location': report.location,
+            'folder': str(report.folder),
+            'keywords': str(report.keywords),
+            'private': report.private,
+            'authorized_groups': str(report.authorized_groups),
+            'file_list': file_resp,
+        }
+
+        # Add report json to response
+        report_resp_list.append(rep_resp)
+
+    response = {'report_list': report_resp_list}
+
+    return JsonResponse(response)
+
+
+def json_test(request):
+    report = Report.objects.get(id=1)
+    media_list = Media.objects.filter(report__id=1)
+    file_resp = {}
+    for i in range(len(media_list)):
+        file_str = "file" + str(i)
+        file_resp[file_str] = media_list[i].filename
+    resp = {
+        'short': report.short,
+        'detailed': report.detailed,
+        'time': report.time,
+        'location': report.location,
+        'folder': str(report.folder),
+        'keywords': str(report.keywords),
+        'private': report.private,
+        'authorized_groups': str(report.authorized_groups),
+        'file_list': file_resp,
+    }
+    return JsonResponse(resp)

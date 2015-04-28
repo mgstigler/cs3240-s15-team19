@@ -68,8 +68,9 @@ class Media(BaseModel):
     is_encrypted = models.BooleanField(default=True)
     content = models.FileField()
     report = models.ForeignKey('Report')
-    key = models.CharField(max_length=200)
-    iv = models.CharField(max_length=200)
+    key = models.CharField(max_length=200, default=0)
+    iv = models.CharField(max_length=200, default=0)
+    fileType = models.CharField(default='', max_length=200)
 
     def __str__(self):
         return self.filename

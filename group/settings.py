@@ -107,7 +107,7 @@ STATICFILES_DIRS = (
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
@@ -128,7 +128,10 @@ import dj_database_url
 # NOTE: Commenting this line makes the app work locally.
 # This needs to be uncommented before uploading to Heroku
 # ------------------------------------------------------------
+
 DATABASES['default'] =  dj_database_url.config()
+#DATABASES['default'] =  dj_database_url.config()
+
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
