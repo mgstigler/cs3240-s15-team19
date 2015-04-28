@@ -365,7 +365,7 @@ def register_user(request):
             email_body = "To activate your account, please visit: \
                 /confirm/%s" % (activation_key)
 
-            send_mail(email_subject, email_body, 'sdgennari@gmail.com', [email], fail_silently=False)
+            send_mail(email_subject, email_body, 'g19securewitness@gmail.com', [email], fail_silently=False)
 
             return HttpResponseRedirect('login')
 
@@ -682,7 +682,7 @@ def json_report_list(request, user_id):
 
     return JsonResponse(response)
 
-def json_file_download(request, media_filename):
+def json_file_download(request, user_id, media_filename):
     medias = Media.objects.filter(filename=media_filename)
     # No media objects with that filename found
     if len(medias) == 0:
@@ -691,4 +691,11 @@ def json_file_download(request, media_filename):
         media = medias[0]
         response = HttpResponse(media.content, content_type=media.fileType)
         response['Content-Disposition'] = 'attachment; filename=' + media.filename
+
+        user = User.objects.get(id=user_id)
+
+        email_subject = 'Account Confirmation'
+        email_body = "Key: " + media.key + "\n" + "IV: " + media.iv
+        send_mail(email_subject, email_body, 'g19securewitness@gmail.com', [user.email], fail_silently=False)
+
         return response

@@ -62,7 +62,7 @@ def run_program(http):
                 print("Please include a filename")
             else:
                 media_name = command_split[1]
-                response = download_file(base_url, media_name)
+                response = download_file(base_url, json_user['id'], media_name)
                 if response.data == b'None':
                     print("File could no be downloaded")
                 else:
@@ -101,8 +101,8 @@ def get_decrypt_info():
     iv = input(">>> Please enter the IV to decrypt this file: ")
     decrypt_file(file_name, dec_file, 8192, key, iv)
 
-def download_file(base_url, media_name):
-    url = base_url + '/json_file_download/' + media_name + '/'
+def download_file(base_url, user_id, media_name):
+    url = base_url + '/json_file_download/' + str(user_id) + '/' + media_name + '/'
     response = http.request('GET', url)
     return response
 
