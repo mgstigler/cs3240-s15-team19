@@ -29,6 +29,9 @@ def run_program(http):
         if command == "-1":
             print("Thank you")
             exit()
+        # display help menu
+        elif command == 'help':
+            print_function_list()
         # list reports
         elif command == 'ls':
             print("Reports:")
@@ -38,29 +41,47 @@ def run_program(http):
         # show report details
         elif command.startswith('show'):
             command_split = command.split()
-            report_name = command_split[1]
+            if len(command_split) == 1:
+                print("Please include a filename")
+            else:
+                report_name = command_split[1]
 
-            report_found = False
-            for json_report in json_report_list:
-                if json_report['short'] == report_name:
-                    show_report_details(json_report)
-                    report_found = True
-                    break
+                report_found = False
+                for json_report in json_report_list:
+                    if json_report['short'] == report_name:
+                        show_report_details(json_report)
+                        report_found = True
+                        break
 
-            if not report_found:
-                print("Report not found")
+                if not report_found:
+                    print("Report not found")
         # download encrypted file
         elif command.startswith('download'):
             command_split = command.split()
-            media_name = command_split[1]
-            response = download_file(base_url, media_name)
-            with open(media_name, 'wb') as out_file:
-                out_file.write(response.data)
-            response.release_conn()
-            print("File downloaded")
+            if len(command_split) == 1:
+                print("Please include a filename")
+            else:
+                media_name = command_split[1]
+                response = download_file(base_url, media_name)
+                if response.data == b'None':
+                    print("File could no be downloaded")
+                else:
+                    with open(media_name, 'wb') as out_file:
+                        out_file.write(response.data)
+                    response.release_conn()
+                    print("File downloaded")
         # decrypt file
         elif command.startswith('decrypt'):
             get_decrypt_info()
+        else:
+            print("Command not found")
+
+def print_function_list():
+    print('help \t\t\t -- list all functions')
+    print('ls \t\t\t -- list add reports')
+    print('show <report_name> \t -- show details for the specified report')
+    print('download <file_name> \t -- download the specified file')
+    print('decrypt \t\t -- enter the decryption process')
 
 def decrypt_file(in_filename, out_filename, chunk_size, key, iv):
     des3 = DES3.new(key, DES3.MODE_CFB, iv)
