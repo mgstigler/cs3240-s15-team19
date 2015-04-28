@@ -642,7 +642,6 @@ def json_login(request):
     return JsonResponse(resp)
 
 def json_report_list(request, user_id):
-    print("Called")
     # Get the corresponding user
     user = User.objects.get(id=user_id)
 
@@ -655,10 +654,28 @@ def json_report_list(request, user_id):
 
     report_resp_list = []
     for report in report_list:
+        # Get all the files for a report
+        media_list = Media.objects.filter(report__id=report.id)
+        file_resp = {}
+        for i in range(len(media_list)):
+            file_str = "file" + str(i)
+            file_resp[file_str] = media_list[i].filename
+
+        # Create response for each report
         rep_resp = {
             'id': report.id,
             'short': report.short,
+            'detailed': report.detailed,
+            'time': report.time,
+            'location': report.location,
+            'folder': str(report.folder),
+            'keywords': str(report.keywords),
+            'private': report.private,
+            'authorized_groups': str(report.authorized_groups),
+            'file_list': file_resp,
         }
+
+        # Add report json to response
         report_resp_list.append(rep_resp)
 
     response = {'report_list': report_resp_list}

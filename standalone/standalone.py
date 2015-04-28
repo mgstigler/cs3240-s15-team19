@@ -34,9 +34,30 @@ def run_program(http):
             for json_report in json_report_list:
                 print(json_report['short'])
             print()
+        # show report details
         elif command.startswith('show'):
-            pass
+            command_split = command.split()
+            report_name = command_split[1]
 
+            report_found = False
+            for json_report in json_report_list:
+                if json_report['short'] == report_name:
+                    show_report_details(json_report)
+                    report_found = True
+                    break
+
+            if not report_found:
+                print("Report not found")
+
+def show_report_details(json_report):
+    # Print all fields that are not lists
+    for key in json_report:
+        if key != 'file_list':
+            print(key + ": " + str(json_report[key]))
+    print("Files:")
+    for file in json_report['file_list']:
+        print(json_report['file_list'][file])
+    print()
 
 def get_report_list(base_url, user_id):
     url = base_url + '/json_report_list/' + str(user_id) + '/'
