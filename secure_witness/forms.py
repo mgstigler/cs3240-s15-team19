@@ -12,7 +12,7 @@ from secure_witness.models import (
 )
 
 class ReportForm(forms.ModelForm):
-
+    detailed = forms.CharField(widget=forms.Textarea(attrs={'cols':50, 'rows': 2}))
     date = forms.DateField(widget=forms.DateInput(format='%d/%m/%Y'),
         input_formats=('%d/%m/%Y'),
         required=False)

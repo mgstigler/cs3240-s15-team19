@@ -57,8 +57,8 @@ ROOT_URLCONF = 'group.urls'
 WSGI_APPLICATION = 'group.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
+#Database
+#https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -122,14 +122,14 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'g19securewitness@gmail.com'
 
 # Parse database configuration from $DATABASE_URL
-import dj_database_url
+#import dj_database_url
 
 # ------------------------------------------------------------
 # NOTE: Commenting this line makes the app work locally.
 # This needs to be uncommented before uploading to Heroku
 # ------------------------------------------------------------
 
-DATABASES['default'] =  dj_database_url.config()
+#DATABASES['default'] =  dj_database_url.config()
 #DATABASES['default'] =  dj_database_url.config()
 
 
